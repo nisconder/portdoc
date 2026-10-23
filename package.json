@@ -1,20 +1,22 @@
 {
-  "name": "wsl-port-doctor",
+  "name": "portdoc",
   "version": "0.5.0",
   "description": "Find which process really owns a port across Windows, WSL and Docker.",
   "type": "module",
   "bin": {
-    "portdoc": "./bin/wsl-port-doctor.js",
-    "wsl-port-doctor": "./bin/wsl-port-doctor.js"
+    "portdoc": "./bin/portdoc.js"
   },
   "scripts": {
-    "start": "node ./bin/wsl-port-doctor.js",
+    "start": "node ./bin/portdoc.js",
     "test": "node --test",
-    "check": "node --check ./bin/wsl-port-doctor.js"
+    "check": "node --check ./bin/portdoc.js"
   },
   "engines": {
     "node": ">=18"
   },
+  "os": [
+    "win32"
+  ],
   "files": [
     "bin",
     "src",
@@ -22,7 +24,6 @@
     "portdoc.cmd",
     "portdoc-launcher.cmd",
     "portdoc.ps1",
-    "wsl-port-doctor.cmd",
     "README.md",
     "LICENSE"
   ],
@@ -33,5 +34,9 @@
     "port",
     "diagnostics"
   ],
-  "license": "MIT"
+  "author": "Shengting Huang",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

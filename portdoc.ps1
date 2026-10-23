@@ -33,7 +33,7 @@ do {
 } until ($valid)
 
 Write-Host ""
-& node.exe (Join-Path $PSScriptRoot "bin\wsl-port-doctor.js") $port --lang $language
+& node.exe (Join-Path $PSScriptRoot "bin\portdoc.js") $port --lang $language
 $exitCode = $LASTEXITCODE
 
 Write-Host ""

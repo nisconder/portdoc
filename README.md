@@ -1,4 +1,4 @@
-# wsl-port-doctor
+# portdoc
 
 > Find which process really owns a port across Windows, WSL and Docker.
 
@@ -85,7 +85,7 @@ From a terminal in this repository:
 The package is not on npm yet. Once published, the primary command will be:
 
 ```powershell
-npx wsl-port-doctor 3000
+npx portdoc 3000
 ```
 
 After a global install, the regular command is simply `portdoc 3000`.
@@ -229,7 +229,7 @@ There are no runtime or development dependencies:
 
 ```powershell
 node --test
-node --check .\bin\wsl-port-doctor.js
+node --check .\bin\portdoc.js
 ```
 
 The test suite covers CLI parsing, Windows/WSL/Docker output parsing, and the

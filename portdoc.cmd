@@ -11,5 +11,5 @@ if errorlevel 1 (
   exit /b 2
 )
 
-node.exe "%~dp0bin\wsl-port-doctor.js" %*
+node.exe "%~dp0bin\portdoc.js" %*
 exit /b %errorlevel%
