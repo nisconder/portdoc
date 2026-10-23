@@ -1,6 +1,6 @@
 {
   "name": "portdoc",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Find which process really owns a port across Windows, WSL and Docker.",
   "type": "module",
   "bin": {
@@ -36,6 +36,14 @@
   ],
   "author": "Shengting Huang",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nisconder/portdoc.git"
+  },
+  "homepage": "https://github.com/nisconder/portdoc#readme",
+  "bugs": {
+    "url": "https://github.com/nisconder/portdoc/issues"
+  },
   "publishConfig": {
     "access": "public"
   }
