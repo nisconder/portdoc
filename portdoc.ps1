@@ -1,11 +1,11 @@
 [CmdletBinding()]
 param()
 
-$Host.UI.RawUI.WindowTitle = "WSL Port Doctor"
+$Host.UI.RawUI.WindowTitle = "portdoc"
 
 Write-Host ""
-Write-Host "  WSL PORT DOCTOR" -ForegroundColor Cyan
-Write-Host "  Find who owns a port across Windows, WSL and Docker." -ForegroundColor DarkGray
+Write-Host "  PORTDOC" -ForegroundColor Cyan
+Write-Host "  One port. Windows, WSL and Docker. One answer." -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  Use this when:" -ForegroundColor White
 Write-Host "    - localhost opens the wrong application"

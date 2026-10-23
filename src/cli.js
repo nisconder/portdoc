@@ -8,7 +8,7 @@ export async function main(argv, dependencies = {}) {
     options = parseArgs(argv);
   } catch (error) {
     (dependencies.stderr ?? console.error)(error.message);
-    (dependencies.stderr ?? console.error)("Run wsl-port-doctor --help for usage.");
+    (dependencies.stderr ?? console.error)("Run portdoc --help for usage.");
     return 2;
   }
 
@@ -78,12 +78,12 @@ function exitCodeFor(verdict) {
   return 0;
 }
 
-const HELP = `wsl-port-doctor ${VERSION}
+const HELP = `portdoc ${VERSION}
 
 Find which process really owns a TCP port across Windows, WSL and Docker.
 
 Usage:
-  wsl-port-doctor <port> [options]
+  portdoc <port> [options]
 
 Options:
   -d, --distro <name>  Inspect a specific WSL distribution

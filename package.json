@@ -1,9 +1,10 @@
 {
   "name": "wsl-port-doctor",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Find which process really owns a port across Windows, WSL and Docker.",
   "type": "module",
   "bin": {
+    "portdoc": "./bin/wsl-port-doctor.js",
     "wsl-port-doctor": "./bin/wsl-port-doctor.js"
   },
   "scripts": {
@@ -18,8 +19,9 @@
     "bin",
     "src",
     "schema",
+    "portdoc.cmd",
+    "portdoc.ps1",
     "wsl-port-doctor.cmd",
-    "wsl-port-doctor.ps1",
     "README.md",
     "LICENSE"
   ],

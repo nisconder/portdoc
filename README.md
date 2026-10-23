@@ -2,6 +2,10 @@
 
 > Find which process really owns a port across Windows, WSL and Docker.
 
+```text
+portdoc 3000
+```
+
 Windows, WSL2, and Docker Desktop each have their own view of networking. A
 port can look free in one layer, be occupied in another, and be forwarded or
 shadowed before a connection reaches the service you expected.
@@ -53,14 +57,14 @@ Confidence: high
 
 ### Easiest on Windows
 
-Double-click [`wsl-port-doctor.cmd`](./wsl-port-doctor.cmd). It explains when
+Double-click [`portdoc.cmd`](./portdoc.cmd). It explains when
 the tool is useful, asks for a port number, and keeps the result open so it can
 be read or screenshotted.
 
 From a terminal in this repository:
 
 ```powershell
-.\wsl-port-doctor.cmd 3000
+.\portdoc.cmd 3000
 ```
 
 The package is not on npm yet. Once published, the primary command will be:
@@ -68,6 +72,8 @@ The package is not on npm yet. Once published, the primary command will be:
 ```powershell
 npx wsl-port-doctor 3000
 ```
+
+After a global install, the regular command is simply `portdoc 3000`.
 
 Requirements:
 
@@ -87,7 +93,7 @@ distinguishes “CLI not installed” from “CLI installed but daemon unavailab
 ## Usage
 
 ```text
-wsl-port-doctor <port> [options]
+portdoc <port> [options]
 
 -d, --distro <name>  Inspect a specific WSL distribution
     --docker-path <file>
@@ -103,16 +109,16 @@ Examples:
 
 ```powershell
 # Inspect the default WSL distribution
-.\wsl-port-doctor.cmd 5173
+.\portdoc.cmd 5173
 
 # Inspect Ubuntu specifically
-.\wsl-port-doctor.cmd 5173 --distro Ubuntu
+.\portdoc.cmd 5173 --distro Ubuntu
 
 # Feed a stable report into another tool
-.\wsl-port-doctor.cmd 5173 --json
+.\portdoc.cmd 5173 --json
 
 # Collect listener evidence without opening test connections
-.\wsl-port-doctor.cmd 5173 --no-probe
+.\portdoc.cmd 5173 --no-probe
 ```
 
 ## Verdicts and exit codes
