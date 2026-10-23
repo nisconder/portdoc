@@ -11,10 +11,5 @@ if errorlevel 1 (
   exit /b 2
 )
 
-if "%~1"=="" (
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0portdoc.ps1"
-  exit /b %errorlevel%
-)
-
 node.exe "%~dp0bin\wsl-port-doctor.js" %*
 exit /b %errorlevel%

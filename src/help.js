@@ -17,6 +17,7 @@ ABOUT
   not behave as expected.
 
 USAGE
+  portdoc                            Show this help
   portdoc <port> [options]
   portdoc help [--lang en|zh-CN]
   portdoc --version
@@ -71,7 +72,8 @@ SAFETY AND LIMITS
 
 FROM THIS SOURCE CHECKOUT
   .\\portdoc.cmd <port>               Run with an explicit port
-  .\\portdoc.cmd                      Open the interactive Windows launcher`;
+  .\\portdoc.cmd                      Show this help
+  .\\portdoc-launcher.cmd             Open the interactive Windows launcher`;
 }
 
 function chineseHelp() {
@@ -86,6 +88,7 @@ function chineseHelp() {
   访问，或者 Docker 已发布端口但连接行为不符合预期等情况。
 
 用法
+  portdoc                            显示此帮助
   portdoc <端口> [选项]
   portdoc help [--lang en|zh-CN]
   portdoc --version
@@ -139,5 +142,6 @@ function chineseHelp() {
 
 在源码目录运行
   .\\portdoc.cmd <端口>               检查指定端口
-  .\\portdoc.cmd                      打开 Windows 交互启动器`;
+  .\\portdoc.cmd                      显示此帮助
+  .\\portdoc-launcher.cmd             打开 Windows 交互启动器`;
 }

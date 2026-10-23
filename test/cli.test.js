@@ -35,6 +35,27 @@ test("supports a detailed help command without requiring a port", async () => {
   assert.match(writes[0], /SAFETY AND LIMITS/);
 });
 
+test("treats a bare portdoc invocation exactly like portdoc help", async () => {
+  const bareWrites = [];
+  const helpWrites = [];
+  const bareExitCode = await main([], {
+    systemLocale: "en-US",
+    environment: {},
+    stdout: (value) => bareWrites.push(value),
+    stderr: (value) => bareWrites.push(value),
+  });
+  const helpExitCode = await main(["help"], {
+    systemLocale: "en-US",
+    environment: {},
+    stdout: (value) => helpWrites.push(value),
+    stderr: (value) => helpWrites.push(value),
+  });
+
+  assert.equal(bareExitCode, 0);
+  assert.equal(helpExitCode, 0);
+  assert.deepEqual(bareWrites, helpWrites);
+});
+
 test("renders Simplified Chinese help", async () => {
   const writes = [];
   const exitCode = await main(["help", "--lang=zh-CN"], {

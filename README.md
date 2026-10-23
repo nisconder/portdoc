@@ -7,7 +7,9 @@ portdoc 3000
 ```
 
 `3000` is only an example. Replace it with any TCP port from `1` to `65535`.
-Run `portdoc help` for scenarios, options, verdicts, exit codes, and examples.
+Run `portdoc` or `portdoc help` for scenarios, options, verdicts, exit codes,
+and examples. A bare `portdoc` invocation is exactly equivalent to
+`portdoc help`.
 
 The terminal interface puts the verdict first, then shows ownership,
 reachability, findings, and concrete next steps. Colors are enabled only for
@@ -39,10 +41,9 @@ a process or changes networking settings.
 ```text
 PORTDOC  3000/tcp · 127.0.0.1
 
-╭────────────────────────────────────────────────────────────╮
-│ × CONFLICT                                                 │
-│ Multiple independent layers claim this port.               │
-╰────────────────────────────────────────────────────────────╯
+╭─ × CONFLICT
+│  Multiple independent layers claim this port.
+╰─────────────────────────────────────────────────────────────
 
 OWNERSHIP
   ● Windows        node (PID 4180)
@@ -69,7 +70,7 @@ Confidence high · read-only · no settings changed
 
 ### Easiest on Windows
 
-Double-click [`portdoc.cmd`](./portdoc.cmd). It explains when
+Double-click [`portdoc-launcher.cmd`](./portdoc-launcher.cmd). It explains when
 the tool is useful, asks for a port number, and keeps the result open so it can
 be read or screenshotted.
 
@@ -77,6 +78,7 @@ From a terminal in this repository:
 
 ```powershell
 .\portdoc.cmd 3000
+.\portdoc.cmd
 .\portdoc.cmd help
 ```
 

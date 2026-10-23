@@ -45,6 +45,8 @@ export function parseArgs(argv) {
   const options = { json: false, probe: true, timeoutMs: 4_000 };
   const positional = [];
 
+  if (argv.length === 0) return { ...options, help: true };
+
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "help" || value === "--help" || value === "-h" || value === "-?") options.help = true;
