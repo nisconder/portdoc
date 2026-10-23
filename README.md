@@ -6,6 +6,9 @@
 portdoc 3000
 ```
 
+`3000` is only an example. Replace it with any TCP port from `1` to `65535`.
+Run `portdoc help` for scenarios, options, verdicts, exit codes, and examples.
+
 Windows, WSL2, and Docker Desktop each have their own view of networking. A
 port can look free in one layer, be occupied in another, and be forwarded or
 shadowed before a connection reaches the service you expected.
@@ -65,6 +68,7 @@ From a terminal in this repository:
 
 ```powershell
 .\portdoc.cmd 3000
+.\portdoc.cmd help
 ```
 
 The package is not on npm yet. Once published, the primary command will be:

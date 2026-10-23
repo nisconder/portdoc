@@ -19,6 +19,19 @@ test("rejects invalid ports", () => {
   assert.throws(() => parseArgs(["three-thousand"]), /Invalid TCP port/);
 });
 
+test("supports a detailed help command without requiring a port", async () => {
+  const writes = [];
+  const exitCode = await main(["help"], {
+    stdout: (value) => writes.push(value),
+    stderr: (value) => writes.push(value),
+  });
+  assert.equal(exitCode, 0);
+  assert.match(writes[0], /3000 is only an example/);
+  assert.match(writes[0], /WHAT GETS CHECKED/);
+  assert.match(writes[0], /VERDICTS/);
+  assert.match(writes[0], /SAFETY AND LIMITS/);
+});
+
 test("JSON mode returns conflict exit code and a machine-readable report", async () => {
   const writes = [];
   const report = {

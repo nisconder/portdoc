@@ -13,7 +13,7 @@ export async function main(argv, dependencies = {}) {
   }
 
   if (options.help) {
-    (dependencies.stdout ?? console.log)(HELP);
+    (dependencies.stdout ?? console.log)(HELP_TEXT);
     return 0;
   }
   if (options.version) {
@@ -37,7 +37,7 @@ export function parseArgs(argv) {
 
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
-    if (value === "--help" || value === "-h") options.help = true;
+    if (value === "help" || value === "--help" || value === "-h" || value === "-?") options.help = true;
     else if (value === "--version" || value === "-v") options.version = true;
     else if (value === "--json") options.json = true;
     else if (value === "--no-probe") options.probe = false;
@@ -78,27 +78,68 @@ function exitCodeFor(verdict) {
   return 0;
 }
 
-const HELP = `portdoc ${VERSION}
+export const HELP_TEXT = `portdoc ${VERSION} — explain a TCP port across Windows, WSL and Docker
 
-Find which process really owns a TCP port across Windows, WSL and Docker.
+ABOUT
+  Windows, WSL2 and Docker Desktop do not share one simple port table.
+  portdoc combines their listener and port-mapping evidence, then checks
+  whether Windows and WSL can actually connect to the requested port.
 
-Usage:
+  Use it when a server reports EADDRINUSE, localhost opens the wrong app,
+  a WSL service is unreachable from Windows, or a Docker-published port does
+  not behave as expected.
+
+USAGE
   portdoc <port> [options]
+  portdoc help
+  portdoc --version
 
-Options:
-  -d, --distro <name>  Inspect a specific WSL distribution
+ARGUMENT
+  <port>               Any TCP port from 1 to 65535.
+                       3000 is only an example, not a default or requirement.
+
+EXAMPLES
+  portdoc 80                         Inspect an HTTP port
+  portdoc 5173                       Inspect a Vite development server
+  portdoc 8080 --distro Ubuntu      Select a WSL distribution
+  portdoc 5432 --no-probe           Inspect PostgreSQL without connecting
+  portdoc 3000 --json               Emit a machine-readable report
+  portdoc 3000 --timeout 10000      Allow slower collectors ten seconds
+  portdoc 3000 --docker-path C:\\Docker\\docker.exe
+                                     Use a non-standard Docker CLI location
+
+WHAT GETS CHECKED
+  Windows              Listening address, PID, process name and executable
+  WSL                  Listening address, PID and process from ss
+  Docker               Published host port, container port, name and image
+  Reachability         TCP connection from Windows and separately from WSL
+
+OPTIONS
+  -d, --distro <name>  Inspect this WSL distribution instead of the default
       --docker-path <file>
-                       Use a specific Docker CLI executable
-      --json           Emit the stable JSON report (schemaVersion 1)
-      --no-probe       Do not make TCP reachability probes
-      --timeout <ms>   Collector timeout, from 250 to 30000 (default: 4000)
-  -h, --help           Show help
-  -v, --version        Show version
+                       Use this Docker CLI instead of automatic discovery
+      --json           Emit JSON matching schema/report.schema.json
+      --no-probe       Collect ownership evidence without opening TCP probes
+      --timeout <ms>   Collector timeout from 250 to 30000 (default: 4000)
+  -h, -?, --help       Show this help
+  -v, --version        Show the installed version
 
-Exit codes:
-  0  FREE or OK
-  1  CONFLICT
-  2  UNKNOWN or invalid invocation
+VERDICTS
+  FREE                 Every collector succeeded and found no owner
+  OK                   One effective ownership path was identified
+  CONFLICT             Independent Windows, WSL or Docker layers claim it
+  UNKNOWN              Evidence is unavailable, incomplete or contradictory
 
-This tool is read-only. A reachability probe proves that a TCP connection can
-be opened; it does not by itself identify which process accepted it.`;
+EXIT CODES
+  0                    FREE or OK
+  1                    CONFLICT
+  2                    UNKNOWN or invalid invocation
+
+SAFETY AND LIMITS
+  portdoc is read-only. It never kills a process or changes networking.
+  A successful TCP probe proves reachability, not which process accepted the
+  connection. The current release inspects TCP only, not UDP.
+
+FROM THIS SOURCE CHECKOUT
+  .\\portdoc.cmd <port>               Run with an explicit port
+  .\\portdoc.cmd                      Open the interactive Windows launcher`;
