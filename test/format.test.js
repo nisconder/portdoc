@@ -68,3 +68,14 @@ test("adds ANSI colors only when requested", () => {
   const output = formatText(sampleReport(), { color: true, width: 72 });
   assert.match(output, /\u001b\[/);
 });
+
+test("localizes the complete CUI in Simplified Chinese", () => {
+  const output = formatText(sampleReport(), { color: false, width: 72, language: "zh-CN" });
+  assert.match(output, /端口冲突 · CONFLICT/);
+  assert.match(output, /端口归属/);
+  assert.match(output, /可达性/);
+  assert.match(output, /问题分析/);
+  assert.match(output, /下一步/);
+  assert.match(output, /选择唯一归属/);
+  assert.match(output, /置信度 高/);
+});

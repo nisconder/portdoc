@@ -1,40 +1,46 @@
+import { createMessages } from "./i18n.js";
+
 export function formatText(report, options = {}) {
   const width = normalizeWidth(options.width);
   const paint = createPainter(options.color ?? false);
+  const messages = createMessages(options.language ?? "en");
   const lines = [
     `${paint.brand("PORTDOC")}  ${paint.muted(`${report.port}/tcp · ${report.target}`)}`,
     "",
-    ...formatSummary(report, paint, width),
+    ...formatSummary(report, paint, width, messages),
     "",
-    paint.section("OWNERSHIP"),
-    ...formatOwnership(report, paint, width),
+    paint.section(messages.t("ownership")),
+    ...formatOwnership(report, paint, width, messages),
     "",
-    paint.section(`REACHABILITY  ${report.target}:${report.port}`),
-    ...formatReachability(report, paint, width),
+    paint.section(`${messages.t("reachability")}  ${report.target}:${report.port}`),
+    ...formatReachability(report, paint, width, messages),
   ];
 
   if (report.assessment.findings.length) {
-    lines.push("", paint.section("FINDINGS"), ...formatFindings(report.assessment.findings, paint, width));
+    lines.push("", paint.section(messages.t("findings")), ...formatFindings(report.assessment.findings, paint, width, messages));
   }
 
-  const nextSteps = buildNextSteps(report);
+  const nextSteps = buildNextSteps(report, messages);
   if (nextSteps.length) {
-    lines.push("", paint.section("NEXT"), ...formatNextSteps(nextSteps, paint, width));
+    lines.push("", paint.section(messages.t("next")), ...formatNextSteps(nextSteps, paint, width));
   }
 
   lines.push(
     "",
-    ...wrapText(`Confidence ${report.assessment.confidence} · read-only · no settings changed`, width).map(paint.muted),
+    ...wrapText(
+      messages.t("confidence", { value: messages.t(`confidence${capitalize(report.assessment.confidence)}`) }),
+      width,
+    ).map(paint.muted),
   );
   return lines.join("\n");
 }
 
-function formatSummary(report, paint, width) {
+function formatSummary(report, paint, width, messages) {
   const boxWidth = Math.max(32, Math.min(74, width));
   const innerWidth = boxWidth - 4;
   const verdict = report.assessment.verdict;
-  const verdictText = `${verdictSymbol(verdict)} ${verdict}`;
-  const summaryLines = wrapText(report.assessment.summary, innerWidth);
+  const verdictText = `${verdictSymbol(verdict)} ${messages.t(`verdict${verdict}`)}`;
+  const summaryLines = wrapText(localizedSummary(report, messages), innerWidth);
   const lines = [`╭${"─".repeat(boxWidth - 2)}╮`, cardLine(verdictText, paint.verdict(verdictText, verdict), innerWidth)];
   for (const line of summaryLines) lines.push(cardLine(line, paint.bold(line), innerWidth));
   lines.push(`╰${"─".repeat(boxWidth - 2)}╯`);
@@ -42,28 +48,29 @@ function formatSummary(report, paint, width) {
 }
 
 function cardLine(raw, styled, innerWidth) {
-  return `│ ${styled}${" ".repeat(Math.max(0, innerWidth - raw.length))} │`;
+  return `│ ${styled}${" ".repeat(Math.max(0, innerWidth - displayWidth(raw)))} │`;
 }
 
-function formatOwnership(report, paint, width) {
+function formatOwnership(report, paint, width, messages) {
   return [
-    ...formatListenerSource("Windows", report.sources.windows, paint, width),
+    ...formatListenerSource(messages.t("windows"), report.sources.windows, paint, width, messages),
     ...formatListenerSource(
-      report.sources.wsl.distro ? `WSL · ${report.sources.wsl.distro}` : "WSL",
+      report.sources.wsl.distro ? `${messages.t("wsl")} · ${report.sources.wsl.distro}` : messages.t("wsl"),
       report.sources.wsl,
       paint,
       width,
+      messages,
     ),
-    ...formatDocker(report.sources.docker, paint, width),
+    ...formatDocker(report.sources.docker, paint, width, messages),
   ];
 }
 
-function formatListenerSource(label, source, paint, width) {
+function formatListenerSource(label, source, paint, width, messages) {
   if (source.status !== "ok") {
-    return formatRow({ symbol: "!", label, primary: statusLabel(source.status), detail: source.reason, tone: "warn" }, paint, width);
+    return formatRow({ symbol: "!", label, primary: statusLabel(source.status, messages), detail: localizeReason(source.reason, messages), tone: "warn" }, paint, width);
   }
   if (!source.listeners.length) {
-    return formatRow({ symbol: "○", label, primary: "No listener", tone: "muted" }, paint, width);
+    return formatRow({ symbol: "○", label, primary: messages.t("noListener"), tone: "muted" }, paint, width);
   }
 
   return source.listeners.flatMap((item, index) =>
@@ -71,7 +78,7 @@ function formatListenerSource(label, source, paint, width) {
       {
         symbol: "●",
         label: index === 0 ? label : "",
-        primary: owner(item.process, item.pid),
+        primary: owner(item.process, item.pid, messages),
         detail: endpoint(item.address, item.port),
         tone: "info",
       },
@@ -81,23 +88,23 @@ function formatListenerSource(label, source, paint, width) {
   );
 }
 
-function formatDocker(source, paint, width) {
+function formatDocker(source, paint, width, messages) {
   if (source.status !== "ok") {
     return formatRow(
-      { symbol: "!", label: "Docker", primary: statusLabel(source.status), detail: source.reason, tone: "warn" },
+      { symbol: "!", label: messages.t("docker"), primary: statusLabel(source.status, messages), detail: localizeReason(source.reason, messages), tone: "warn" },
       paint,
       width,
     );
   }
   if (!source.mappings.length) {
-    return formatRow({ symbol: "○", label: "Docker", primary: "No published mapping", tone: "muted" }, paint, width);
+    return formatRow({ symbol: "○", label: messages.t("docker"), primary: messages.t("noMapping"), tone: "muted" }, paint, width);
   }
 
   return source.mappings.flatMap((item, index) =>
     formatRow(
       {
         symbol: "●",
-        label: index === 0 ? "Docker" : "",
+        label: index === 0 ? messages.t("docker") : "",
         primary: `${item.container} · ${item.image}`,
         detail: `${endpoint(item.hostAddress, item.hostPort)} → ${item.containerPort}/tcp`,
         tone: "info",
@@ -108,20 +115,20 @@ function formatDocker(source, paint, width) {
   );
 }
 
-function formatReachability(report, paint, width) {
+function formatReachability(report, paint, width, messages) {
   return [
-    ...formatProbe("Windows", report.probes.windows, paint, width),
-    ...formatProbe("WSL", report.probes.wsl, paint, width),
+    ...formatProbe(messages.t("windows"), report.probes.windows, paint, width, messages),
+    ...formatProbe(messages.t("wsl"), report.probes.wsl, paint, width, messages),
   ];
 }
 
-function formatProbe(label, probe, paint, width) {
+function formatProbe(label, probe, paint, width, messages) {
   if (probe.reachable === true) {
     return formatRow(
       {
         symbol: "✓",
         label,
-        primary: `Reachable${probe.latencyMs == null ? "" : ` · ${probe.latencyMs} ms`}`,
+        primary: `${messages.t("reachable")}${probe.latencyMs == null ? "" : ` · ${probe.latencyMs} ms`}`,
         tone: "good",
       },
       paint,
@@ -130,7 +137,7 @@ function formatProbe(label, probe, paint, width) {
   }
   if (probe.reachable === false) {
     return formatRow(
-      { symbol: "×", label, primary: "Not reachable", detail: probe.reason, tone: "bad" },
+      { symbol: "×", label, primary: messages.t("notReachable"), detail: localizeReason(probe.reason, messages), tone: "bad" },
       paint,
       width,
     );
@@ -139,8 +146,8 @@ function formatProbe(label, probe, paint, width) {
     {
       symbol: probe.status === "skipped" ? "—" : "!",
       label,
-      primary: statusLabel(probe.status),
-      detail: probe.reason,
+      primary: statusLabel(probe.status, messages),
+      detail: localizeReason(probe.reason, messages),
       tone: probe.status === "skipped" ? "muted" : "warn",
     },
     paint,
@@ -148,10 +155,10 @@ function formatProbe(label, probe, paint, width) {
   );
 }
 
-function formatFindings(findings, paint, width) {
+function formatFindings(findings, paint, width, messages) {
   return findings.flatMap((finding) => {
     const tone = finding.severity === "high" ? "bad" : finding.severity === "medium" ? "warn" : "info";
-    return formatRow({ symbol: finding.severity === "high" ? "!" : "?", label: "", primary: finding.message, tone }, paint, width);
+    return formatRow({ symbol: finding.severity === "high" ? "!" : "?", label: "", primary: localizedFinding(finding, messages), tone }, paint, width);
   });
 }
 
@@ -165,12 +172,14 @@ function formatNextSteps(steps, paint, width) {
 
 function formatRow(row, paint, width) {
   const labelWidth = 14;
-  const prefix = `  ${row.symbol} ${row.label.padEnd(labelWidth)} `;
-  const continuation = " ".repeat(prefix.length);
-  const available = Math.max(20, width - prefix.length);
+  const paddedLabel = padDisplay(row.label, labelWidth);
+  const prefix = `  ${row.symbol} ${paddedLabel} `;
+  const prefixWidth = displayWidth(prefix);
+  const continuation = " ".repeat(prefixWidth);
+  const available = Math.max(20, width - prefixWidth);
   const tone = paint[row.tone] ?? paint.text;
   const primaryLines = wrapText(row.primary, available);
-  const lines = primaryLines.map((line, index) => `${index === 0 ? paint.symbol(row.symbol, row.tone) + ` ${row.label.padEnd(labelWidth)} ` : continuation}${tone(line)}`);
+  const lines = primaryLines.map((line, index) => `${index === 0 ? paint.symbol(row.symbol, row.tone) + ` ${paddedLabel} ` : continuation}${tone(line)}`);
 
   if (row.detail) {
     for (const detailLine of wrapText(row.detail, available)) {
@@ -180,39 +189,39 @@ function formatRow(row, paint, width) {
   return lines;
 }
 
-function buildNextSteps(report) {
+function buildNextSteps(report, messages) {
   const steps = new Set();
   const { windows, wsl, docker } = report.sources;
   const findingCodes = new Set(report.assessment.findings.map((finding) => finding.code));
 
   if (docker.status !== "ok") {
     if (/engine is not running|cannot be accessed/i.test(docker.reason ?? "")) {
-      steps.add("Start Docker Desktop, wait until its engine is running, then retry.");
+      steps.add(messages.t("nextDockerStart"));
     } else if (/not found/i.test(docker.reason ?? "")) {
-      steps.add("Install Docker Desktop or pass its CLI location with --docker-path <file>.");
+      steps.add(messages.t("nextDockerInstall"));
     }
   }
   if (wsl.status !== "ok") {
     if (/E_ACCESSDENIED/i.test(wsl.reason ?? "")) {
-      steps.add("Run wsl --status in a normal Windows terminal, resolve the WSL access error, then retry.");
+      steps.add(messages.t("nextWslAccess"));
     } else if (/ss command/i.test(wsl.reason ?? "")) {
-      steps.add("Install iproute2 inside the selected WSL distribution so portdoc can use ss.");
+      steps.add(messages.t("nextInstallSs"));
     } else {
-      steps.add("Check wsl --status and verify that the selected WSL distribution can start.");
+      steps.add(messages.t("nextWslCheck"));
     }
   }
-  if (windows.status !== "ok") steps.add("Retry from a normal Windows terminal that can run netstat.exe.");
+  if (windows.status !== "ok") steps.add(messages.t("nextWindowsCheck"));
   if (findingCodes.has("WINDOWS_WSL_COLLISION")) {
-    steps.add("Choose one owner: stop the Windows listener or move the WSL service to another port.");
+    steps.add(messages.t("nextWindowsWsl"));
   }
   if (findingCodes.has("DOCKER_WSL_COLLISION")) {
-    steps.add("Change either the Docker host mapping or the native WSL service port.");
+    steps.add(messages.t("nextDockerWsl"));
   }
   if (findingCodes.has("WINDOWS_DOCKER_COLLISION")) {
-    steps.add("Stop or move the Windows listener before publishing this Docker host port.");
+    steps.add(messages.t("nextWindowsDocker"));
   }
   if (findingCodes.has("WSL_NOT_REACHABLE_FROM_WINDOWS")) {
-    steps.add("Confirm the WSL service binds to 0.0.0.0, then review WSL localhost forwarding or mirrored networking.");
+    steps.add(messages.t("nextWslForwarding"));
   }
 
   return [...steps];
@@ -223,20 +232,62 @@ function endpoint(address, port) {
   return `${formattedAddress}:${port}`;
 }
 
-function owner(processName, pid) {
-  if (!processName && !pid) return "process details unavailable";
+function owner(processName, pid, messages) {
+  if (!processName && !pid) return messages.t("processUnavailable");
   if (!processName) return `PID ${pid}`;
   return pid ? `${processName} (PID ${pid})` : processName;
 }
 
-function statusLabel(status) {
-  return status.charAt(0).toUpperCase() + status.slice(1);
+function statusLabel(status, messages) {
+  const key = `status${capitalize(status)}`;
+  const translated = messages.t(key);
+  return translated === key ? capitalize(status) : translated;
 }
 
 function verdictSymbol(verdict) {
   if (verdict === "CONFLICT") return "×";
   if (verdict === "UNKNOWN") return "?";
   return "✓";
+}
+
+function localizedSummary(report, messages) {
+  const { verdict } = report.assessment;
+  if (verdict === "FREE") return messages.t("summaryFREE");
+  if (verdict === "CONFLICT") return messages.t("summaryCONFLICT");
+  if (verdict === "UNKNOWN") {
+    if (report.assessment.findings.some((finding) => finding.code === "WSL_NOT_REACHABLE_FROM_WINDOWS")) {
+      return messages.t("summaryWslForwarding");
+    }
+    return messages.t("summaryUNKNOWN");
+  }
+
+  const { windows, wsl, docker } = report.sources;
+  if (docker.mappings.length) {
+    const count = new Set(docker.mappings.map((mapping) => mapping.containerId || mapping.container)).size;
+    return messages.t("ownerDocker", { count });
+  }
+  if (windows.listeners.length) return messages.t("ownerWindows", { count: windows.listeners.length });
+  if (wsl.listeners.length) return messages.t("ownerWsl", { count: wsl.listeners.length });
+  return report.assessment.summary;
+}
+
+function localizedFinding(finding, messages) {
+  const key = `finding${finding.code}`;
+  const translated = messages.t(key);
+  return translated === key ? finding.message : translated;
+}
+
+function localizeReason(reason, messages) {
+  if (!reason) return reason;
+  if (/engine is not running|cannot be accessed/i.test(reason)) return messages.t("reasonDockerEngine");
+  if (/Docker CLI was not found/i.test(reason)) return messages.t("reasonDockerMissing");
+  if (/E_ACCESSDENIED/i.test(reason)) return messages.t("reasonWslAccess");
+  if (/Disabled by --no-probe/i.test(reason)) return messages.t("reasonProbeDisabled");
+  return reason;
+}
+
+function capitalize(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function normalizeWidth(value) {
@@ -253,9 +304,17 @@ function wrapText(value, width) {
   let line = "";
 
   for (const word of words) {
-    if (!line) {
+    if (displayWidth(word) > width) {
+      if (line) {
+        lines.push(line);
+        line = "";
+      }
+      const chunks = splitByWidth(word, width);
+      lines.push(...chunks.slice(0, -1));
+      line = chunks.at(-1) ?? "";
+    } else if (!line) {
       line = word;
-    } else if (line.length + word.length + 1 <= width) {
+    } else if (displayWidth(line) + displayWidth(word) + 1 <= width) {
       line += ` ${word}`;
     } else {
       lines.push(line);
@@ -264,6 +323,52 @@ function wrapText(value, width) {
   }
   if (line) lines.push(line);
   return lines;
+}
+
+function splitByWidth(value, width) {
+  const chunks = [];
+  let chunk = "";
+  let chunkWidth = 0;
+  for (const character of value) {
+    const characterWidth = displayWidth(character);
+    if (chunk && chunkWidth + characterWidth > width) {
+      chunks.push(chunk);
+      chunk = "";
+      chunkWidth = 0;
+    }
+    chunk += character;
+    chunkWidth += characterWidth;
+  }
+  if (chunk) chunks.push(chunk);
+  return chunks;
+}
+
+function padDisplay(value, width) {
+  return `${value}${" ".repeat(Math.max(0, width - displayWidth(value)))}`;
+}
+
+function displayWidth(value) {
+  let width = 0;
+  for (const character of String(value)) {
+    const codePoint = character.codePointAt(0);
+    width += isWideCharacter(codePoint) ? 2 : 1;
+  }
+  return width;
+}
+
+function isWideCharacter(codePoint) {
+  return (
+    (codePoint >= 0x1100 && codePoint <= 0x115f) ||
+    codePoint === 0x2329 ||
+    codePoint === 0x232a ||
+    (codePoint >= 0x2e80 && codePoint <= 0xa4cf) ||
+    (codePoint >= 0xac00 && codePoint <= 0xd7a3) ||
+    (codePoint >= 0xf900 && codePoint <= 0xfaff) ||
+    (codePoint >= 0xfe10 && codePoint <= 0xfe19) ||
+    (codePoint >= 0xfe30 && codePoint <= 0xfe6f) ||
+    (codePoint >= 0xff00 && codePoint <= 0xff60) ||
+    (codePoint >= 0xffe0 && codePoint <= 0xffe6)
+  );
 }
 
 function createPainter(enabled) {

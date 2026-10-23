@@ -111,7 +111,10 @@ portdoc <port> [options]
 -d, --distro <name>  Inspect a specific WSL distribution
     --docker-path <file>
                      Use a specific Docker CLI executable
+    --lang <locale>  Interface language: auto, en, or zh-CN
     --json           Emit the stable JSON report (schemaVersion 1)
+    --color          Always use terminal colors
+    --no-color       Never use terminal colors
     --no-probe       Do not make TCP reachability probes
     --timeout <ms>   Collector timeout, from 250 to 30000
 -h, --help           Show help
@@ -127,12 +130,31 @@ Examples:
 # Inspect Ubuntu specifically
 .\portdoc.cmd 5173 --distro Ubuntu
 
+# Use Simplified Chinese or English explicitly
+.\portdoc.cmd 5173 --lang zh-CN
+.\portdoc.cmd 5173 --lang en
+
 # Feed a stable report into another tool
 .\portdoc.cmd 5173 --json
 
 # Collect listener evidence without opening test connections
 .\portdoc.cmd 5173 --no-probe
 ```
+
+## Languages
+
+`portdoc` currently includes complete English and Simplified Chinese
+interfaces. The default `auto` mode follows the operating-system UI language.
+Override it per command with `--lang` or persist it for the current shell:
+
+```powershell
+$env:PORTDOC_LANG = "zh-CN"
+portdoc 5173
+```
+
+Localized output includes help, verdicts, section labels, findings, common
+errors, recommended next steps, and the interactive Windows launcher. JSON
+keys, enum values, finding codes, and schema stay language-independent.
 
 ## Verdicts and exit codes
 

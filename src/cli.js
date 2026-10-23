@@ -1,19 +1,27 @@
 import { diagnose } from "./diagnose.js";
 import { formatText } from "./format.js";
+import { getHelpText } from "./help.js";
+import { createMessages, normalizeLanguage, resolveLanguage } from "./i18n.js";
 import { VERSION } from "./version.js";
 
 export async function main(argv, dependencies = {}) {
+  const requestedLanguage = findRequestedLanguage(argv);
+  const language = resolveLanguage(requestedLanguage, {
+    environment: dependencies.environment,
+    systemLocale: dependencies.systemLocale,
+  });
   let options;
   try {
     options = parseArgs(argv);
   } catch (error) {
-    (dependencies.stderr ?? console.error)(error.message);
-    (dependencies.stderr ?? console.error)("Run portdoc --help for usage.");
+    const messages = createMessages(language);
+    (dependencies.stderr ?? console.error)(localizeArgumentError(error.message, messages));
+    (dependencies.stderr ?? console.error)(messages.t("errorHelp"));
     return 2;
   }
 
   if (options.help) {
-    (dependencies.stdout ?? console.log)(HELP_TEXT);
+    (dependencies.stdout ?? console.log)(getHelpText(language));
     return 0;
   }
   if (options.version) {
@@ -27,6 +35,7 @@ export async function main(argv, dependencies = {}) {
     : formatText(report, {
         color: options.color ?? Boolean(process.stdout.isTTY && !process.env.NO_COLOR),
         width: process.stdout.columns,
+        language,
       });
   (dependencies.stdout ?? console.log)(output);
   return exitCodeFor(report.assessment.verdict);
@@ -44,6 +53,8 @@ export function parseArgs(argv) {
     else if (value === "--color") options.color = true;
     else if (value === "--no-color") options.color = false;
     else if (value === "--no-probe") options.probe = false;
+    else if (value === "--lang" || value === "-l") options.lang = parseLanguage(requireValue(argv, ++index, value));
+    else if (value.startsWith("--lang=")) options.lang = parseLanguage(value.slice("--lang=".length));
     else if (value === "--distro" || value === "-d") options.distro = requireValue(argv, ++index, value);
     else if (value === "--docker-path") options.dockerPath = requireValue(argv, ++index, value);
     else if (value === "--timeout") options.timeoutMs = parseTimeout(requireValue(argv, ++index, value));
@@ -75,76 +86,34 @@ function parseTimeout(value) {
   return number;
 }
 
+function parseLanguage(value) {
+  const language = normalizeLanguage(value);
+  if (!language) throw new Error("--lang must be auto, en, or zh-CN.");
+  return language;
+}
+
+function findRequestedLanguage(argv) {
+  const index = argv.findIndex((value) => value === "--lang" || value === "-l");
+  if (index >= 0) return argv[index + 1];
+  const inline = argv.find((value) => value.startsWith("--lang="));
+  return inline?.slice("--lang=".length);
+}
+
+function localizeArgumentError(message, messages) {
+  if (message === "Provide exactly one TCP port number.") return messages.t("errorPortRequired");
+  if (message === "--timeout must be an integer from 250 to 30000 milliseconds.") return messages.t("errorTimeout");
+  if (message === "--lang must be auto, en, or zh-CN.") return messages.t("errorLanguage");
+  const unknown = message.match(/^Unknown option: (.+)$/);
+  if (unknown) return messages.t("errorUnknownOption", { value: unknown[1] });
+  const invalidPort = message.match(/^Invalid TCP port: (.+)$/);
+  if (invalidPort) return messages.t("errorInvalidPort", { value: invalidPort[1] });
+  const missingValue = message.match(/^(\S+) requires a value\.$/);
+  if (missingValue) return messages.t("errorValueRequired", { option: missingValue[1] });
+  return message;
+}
+
 function exitCodeFor(verdict) {
   if (verdict === "CONFLICT") return 1;
   if (verdict === "UNKNOWN") return 2;
   return 0;
 }
-
-export const HELP_TEXT = `portdoc ${VERSION} — explain a TCP port across Windows, WSL and Docker
-
-ABOUT
-  Windows, WSL2 and Docker Desktop do not share one simple port table.
-  portdoc combines their listener and port-mapping evidence, then checks
-  whether Windows and WSL can actually connect to the requested port.
-
-  Use it when a server reports EADDRINUSE, localhost opens the wrong app,
-  a WSL service is unreachable from Windows, or a Docker-published port does
-  not behave as expected.
-
-USAGE
-  portdoc <port> [options]
-  portdoc help
-  portdoc --version
-
-ARGUMENT
-  <port>               Any TCP port from 1 to 65535.
-                       3000 is only an example, not a default or requirement.
-
-EXAMPLES
-  portdoc 80                         Inspect an HTTP port
-  portdoc 5173                       Inspect a Vite development server
-  portdoc 8080 --distro Ubuntu      Select a WSL distribution
-  portdoc 5432 --no-probe           Inspect PostgreSQL without connecting
-  portdoc 3000 --json               Emit a machine-readable report
-  portdoc 3000 --timeout 10000      Allow slower collectors ten seconds
-  portdoc 3000 --docker-path C:\\Docker\\docker.exe
-                                     Use a non-standard Docker CLI location
-
-WHAT GETS CHECKED
-  Windows              Listening address, PID, process name and executable
-  WSL                  Listening address, PID and process from ss
-  Docker               Published host port, container port, name and image
-  Reachability         TCP connection from Windows and separately from WSL
-
-OPTIONS
-  -d, --distro <name>  Inspect this WSL distribution instead of the default
-      --docker-path <file>
-                       Use this Docker CLI instead of automatic discovery
-      --json           Emit JSON matching schema/report.schema.json
-      --color          Always use terminal colors
-      --no-color       Never use terminal colors
-      --no-probe       Collect ownership evidence without opening TCP probes
-      --timeout <ms>   Collector timeout from 250 to 30000 (default: 4000)
-  -h, -?, --help       Show this help
-  -v, --version        Show the installed version
-
-VERDICTS
-  FREE                 Every collector succeeded and found no owner
-  OK                   One effective ownership path was identified
-  CONFLICT             Independent Windows, WSL or Docker layers claim it
-  UNKNOWN              Evidence is unavailable, incomplete or contradictory
-
-EXIT CODES
-  0                    FREE or OK
-  1                    CONFLICT
-  2                    UNKNOWN or invalid invocation
-
-SAFETY AND LIMITS
-  portdoc is read-only. It never kills a process or changes networking.
-  A successful TCP probe proves reachability, not which process accepted the
-  connection. The current release inspects TCP only, not UDP.
-
-FROM THIS SOURCE CHECKOUT
-  .\\portdoc.cmd <port>               Run with an explicit port
-  .\\portdoc.cmd                      Open the interactive Windows launcher`;
