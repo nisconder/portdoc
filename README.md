@@ -9,11 +9,15 @@ portdoc 3000
 `3000` is only an example. Replace it with any TCP port from `1` to `65535`.
 Run `portdoc help` for scenarios, options, verdicts, exit codes, and examples.
 
+The terminal interface puts the verdict first, then shows ownership,
+reachability, findings, and concrete next steps. Colors are enabled only for
+interactive terminals; use `--no-color` or `NO_COLOR=1` when needed.
+
 Windows, WSL2, and Docker Desktop each have their own view of networking. A
 port can look free in one layer, be occupied in another, and be forwarded or
 shadowed before a connection reaches the service you expected.
 
-Use `wsl-port-doctor` when:
+Use `portdoc` when:
 
 - a development server fails with `EADDRINUSE`, but the process is hard to find;
 - `localhost:3000` opens the wrong application;
@@ -33,27 +37,32 @@ conflict, or cannot be determined from the available evidence. It never kills
 a process or changes networking settings.
 
 ```text
-PORT 3000/TCP
+PORTDOC  3000/tcp · 127.0.0.1
 
-WINDOWS
-  LISTEN  0.0.0.0:3000  node (PID 4180)
+╭────────────────────────────────────────────────────────────╮
+│ × CONFLICT                                                 │
+│ Multiple independent layers claim this port.               │
+╰────────────────────────────────────────────────────────────╯
 
-WSL [Ubuntu-24.04]
-  LISTEN  0.0.0.0:3000  vite (PID 722)
+OWNERSHIP
+  ● Windows        node (PID 4180)
+                   0.0.0.0:3000
+  ● WSL · Ubuntu   vite (PID 722)
+                   0.0.0.0:3000
+  ○ Docker         No published mapping
 
-DOCKER
-  — no published mapping
+REACHABILITY  127.0.0.1:3000
+  ✓ Windows        Reachable · 3 ms
+  ✓ WSL            Reachable · 18 ms
 
-REACHABILITY
-  Windows -> 127.0.0.1  reachable (3 ms)
-  WSL     -> 127.0.0.1  reachable (36 ms)
+FINDINGS
+  !                Windows and WSL both report a TCP listener on this port.
 
-CONFLICT
-Multiple independent layers claim this port.
-  ! Windows and WSL both report a TCP listener on this port; Windows localhost
-    traffic may shadow the WSL service.
+NEXT
+  1. Choose one owner: stop the Windows listener or move the WSL service to
+     another port.
 
-Confidence: high
+Confidence high · read-only · no settings changed
 ```
 
 ## Run it

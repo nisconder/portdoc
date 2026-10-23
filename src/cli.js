@@ -25,7 +25,8 @@ export async function main(argv, dependencies = {}) {
   const output = options.json
     ? JSON.stringify(report, null, 2)
     : formatText(report, {
-        color: Boolean(process.stdout.isTTY && !process.env.NO_COLOR),
+        color: options.color ?? Boolean(process.stdout.isTTY && !process.env.NO_COLOR),
+        width: process.stdout.columns,
       });
   (dependencies.stdout ?? console.log)(output);
   return exitCodeFor(report.assessment.verdict);
@@ -40,6 +41,8 @@ export function parseArgs(argv) {
     if (value === "help" || value === "--help" || value === "-h" || value === "-?") options.help = true;
     else if (value === "--version" || value === "-v") options.version = true;
     else if (value === "--json") options.json = true;
+    else if (value === "--color") options.color = true;
+    else if (value === "--no-color") options.color = false;
     else if (value === "--no-probe") options.probe = false;
     else if (value === "--distro" || value === "-d") options.distro = requireValue(argv, ++index, value);
     else if (value === "--docker-path") options.dockerPath = requireValue(argv, ++index, value);
@@ -119,6 +122,8 @@ OPTIONS
       --docker-path <file>
                        Use this Docker CLI instead of automatic discovery
       --json           Emit JSON matching schema/report.schema.json
+      --color          Always use terminal colors
+      --no-color       Never use terminal colors
       --no-probe       Collect ownership evidence without opening TCP probes
       --timeout <ms>   Collector timeout from 250 to 30000 (default: 4000)
   -h, -?, --help       Show this help
