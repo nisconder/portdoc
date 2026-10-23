@@ -82,13 +82,18 @@ From a terminal in this repository:
 .\portdoc.cmd help
 ```
 
-The package is not on npm yet. Once published, the primary command will be:
+Run it without installing:
 
 ```powershell
 npx portdoc 3000
 ```
 
-After a global install, the regular command is simply `portdoc 3000`.
+Or install it globally to use the short command everywhere:
+
+```powershell
+npm install --global portdoc
+portdoc 3000
+```
 
 Requirements:
 
