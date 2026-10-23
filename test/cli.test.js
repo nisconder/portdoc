@@ -1,0 +1,33 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+import { main, parseArgs } from "../src/cli.js";
+
+test("parses the port and supported options", () => {
+  assert.deepEqual(parseArgs(["3000", "--json", "--distro", "Ubuntu", "--no-probe", "--timeout", "900"]), {
+    port: 3000,
+    json: true,
+    distro: "Ubuntu",
+    probe: false,
+    timeoutMs: 900,
+  });
+});
+
+test("rejects invalid ports", () => {
+  assert.throws(() => parseArgs(["70000"]), /Invalid TCP port/);
+  assert.throws(() => parseArgs(["three-thousand"]), /Invalid TCP port/);
+});
+
+test("JSON mode returns conflict exit code and a machine-readable report", async () => {
+  const writes = [];
+  const report = {
+    assessment: { verdict: "CONFLICT" },
+  };
+  const exitCode = await main(["3000", "--json"], {
+    diagnose: async () => report,
+    stdout: (value) => writes.push(value),
+    stderr: (value) => writes.push(value),
+  });
+  assert.equal(exitCode, 1);
+  assert.deepEqual(JSON.parse(writes[0]), report);
+});

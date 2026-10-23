@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "report.schema.json",
+  "title": "wsl-port-doctor report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "checkedAt",
+    "port",
+    "protocol",
+    "target",
+    "sources",
+    "probes",
+    "assessment"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "checkedAt": { "type": "string", "format": "date-time" },
+    "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+    "protocol": { "const": "tcp" },
+    "target": { "const": "127.0.0.1" },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["windows", "wsl", "docker"],
+      "properties": {
+        "windows": { "$ref": "#/$defs/windowsSource" },
+        "wsl": { "$ref": "#/$defs/wslSource" },
+        "docker": { "$ref": "#/$defs/dockerSource" }
+      }
+    },
+    "probes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["windows", "wsl"],
+      "properties": {
+        "windows": { "$ref": "#/$defs/probe" },
+        "wsl": { "$ref": "#/$defs/probe" }
+      }
+    },
+    "assessment": { "$ref": "#/$defs/assessment" }
+  },
+  "$defs": {
+    "sourceStatus": {
+      "type": "string",
+      "enum": ["ok", "unavailable", "error"]
+    },
+    "nullableString": {
+      "type": ["string", "null"]
+    },
+    "nullableInteger": {
+      "type": ["integer", "null"]
+    },
+    "listener": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["address", "port", "pid", "process"],
+      "properties": {
+        "address": { "type": "string" },
+        "port": { "type": "integer" },
+        "state": { "type": "string" },
+        "pid": { "$ref": "#/$defs/nullableInteger" },
+        "process": { "$ref": "#/$defs/nullableString" },
+        "path": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "windowsSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "listeners"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sourceStatus" },
+        "listeners": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/listener" }
+        },
+        "reason": { "type": "string" }
+      }
+    },
+    "wslSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "listeners"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sourceStatus" },
+        "distro": { "$ref": "#/$defs/nullableString" },
+        "listeners": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/listener" }
+        },
+        "reason": { "type": "string" }
+      }
+    },
+    "dockerSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "mappings"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sourceStatus" },
+        "mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "containerId",
+              "container",
+              "image",
+              "hostAddress",
+              "hostPort",
+              "containerPort",
+              "protocol"
+            ],
+            "properties": {
+              "containerId": { "type": "string" },
+              "container": { "type": "string" },
+              "image": { "type": "string" },
+              "hostAddress": { "type": "string" },
+              "hostPort": { "type": "integer" },
+              "containerPort": { "type": "integer" },
+              "protocol": { "const": "tcp" }
+            }
+          }
+        },
+        "reason": { "type": "string" }
+      }
+    },
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reachable"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["ok", "unavailable", "error", "skipped"]
+        },
+        "reachable": { "type": ["boolean", "null"] },
+        "latencyMs": { "type": "integer", "minimum": 0 },
+        "reason": { "type": "string" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["severity", "code", "message"],
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "code": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "summary", "confidence", "findings"],
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": ["FREE", "OK", "CONFLICT", "UNKNOWN"]
+        },
+        "summary": { "type": "string" },
+        "confidence": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "findings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/finding" }
+        }
+      }
+    }
+  }
+}

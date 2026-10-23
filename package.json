@@ -1,0 +1,32 @@
+{
+  "name": "wsl-port-doctor",
+  "version": "0.1.0",
+  "description": "Find which process really owns a port across Windows, WSL and Docker.",
+  "type": "module",
+  "bin": {
+    "wsl-port-doctor": "./bin/wsl-port-doctor.js"
+  },
+  "scripts": {
+    "start": "node ./bin/wsl-port-doctor.js",
+    "test": "node --test",
+    "check": "node --check ./bin/wsl-port-doctor.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin",
+    "src",
+    "schema",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "wsl",
+    "windows",
+    "docker",
+    "port",
+    "diagnostics"
+  ],
+  "license": "MIT"
+}
