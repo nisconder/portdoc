@@ -36,19 +36,15 @@ export function formatText(report, options = {}) {
 }
 
 function formatSummary(report, paint, width, messages) {
-  const boxWidth = Math.max(32, Math.min(74, width));
-  const innerWidth = boxWidth - 4;
+  const railWidth = Math.max(32, Math.min(74, width));
+  const contentWidth = railWidth - 3;
   const verdict = report.assessment.verdict;
   const verdictText = `${verdictSymbol(verdict)} ${messages.t(`verdict${verdict}`)}`;
-  const summaryLines = wrapText(localizedSummary(report, messages), innerWidth);
-  const lines = [`╭${"─".repeat(boxWidth - 2)}╮`, cardLine(verdictText, paint.verdict(verdictText, verdict), innerWidth)];
-  for (const line of summaryLines) lines.push(cardLine(line, paint.bold(line), innerWidth));
-  lines.push(`╰${"─".repeat(boxWidth - 2)}╯`);
+  const summaryLines = wrapText(localizedSummary(report, messages), contentWidth);
+  const lines = [`╭─ ${paint.verdict(verdictText, verdict)}`];
+  for (const line of summaryLines) lines.push(`│  ${paint.bold(line)}`);
+  lines.push(`╰${"─".repeat(railWidth - 1)}`);
   return lines;
-}
-
-function cardLine(raw, styled, innerWidth) {
-  return `│ ${styled}${" ".repeat(Math.max(0, innerWidth - displayWidth(raw)))} │`;
 }
 
 function formatOwnership(report, paint, width, messages) {

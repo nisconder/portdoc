@@ -43,7 +43,10 @@ function sampleReport() {
 test("renders an outcome-first CUI with ownership, reachability and next steps", () => {
   const output = formatText(sampleReport(), { color: false, width: 72 });
   assert.match(output, /PORTDOC  3000\/tcp/);
-  assert.match(output, /× CONFLICT/);
+  assert.match(output, /^╭─ × CONFLICT$/m);
+  assert.match(output, /^│  Multiple independent layers claim this port\.$/m);
+  assert.match(output, /^╰─+$/m);
+  assert.doesNotMatch(output, /[╮╯]/);
   assert.match(output, /OWNERSHIP/);
   assert.match(output, /node \(PID 4180\)/);
   assert.match(output, /REACHABILITY/);
