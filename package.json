@@ -4,7 +4,7 @@
   "description": "Find which process really owns a port across Windows, WSL and Docker.",
   "type": "module",
   "bin": {
-    "portdoc": "./bin/portdoc.js"
+    "portdoc": "bin/portdoc.js"
   },
   "scripts": {
     "start": "node ./bin/portdoc.js",
