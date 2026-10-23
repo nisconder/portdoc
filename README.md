@@ -2,11 +2,53 @@
 
 > Find which process really owns a port across Windows, WSL and Docker.
 
-```text
+## Install
+
+Run these commands in **Windows PowerShell or Command Prompt**, not inside a
+WSL shell. Node.js 18 or newer is required.
+
+> 中文：请在 Windows PowerShell 或 CMD 中运行，不要在 WSL 终端里安装。
+
+### Permanent install — recommended
+
+```powershell
+npm install --global portdoc@latest
+portdoc --version
+portdoc
+```
+
+The first command installs the CLI globally. `portdoc --version` verifies the
+installation. Running `portdoc` by itself opens the complete help screen.
+
+Then inspect any TCP port:
+
+```powershell
 portdoc 3000
+portdoc 5173
+portdoc 8080
 ```
 
 `3000` is only an example. Replace it with any TCP port from `1` to `65535`.
+
+### Run once without installing
+
+```powershell
+npx --yes portdoc@latest 3000
+```
+
+### If a third-party npm mirror has not synchronized yet
+
+Use the official Registry for this command only; this does not change your
+global npm configuration:
+
+```powershell
+npm install --global portdoc@latest --registry=https://registry.npmjs.org/
+```
+
+Do not use `npm i portdoc` unless you intentionally want a project-local
+dependency. `portdoc` is a command-line application, so the normal persistent
+installation uses `--global`.
+
 Run `portdoc` or `portdoc help` for scenarios, options, verdicts, exit codes,
 and examples. A bare `portdoc` invocation is exactly equivalent to
 `portdoc help`.
@@ -66,9 +108,9 @@ NEXT
 Confidence high · read-only · no settings changed
 ```
 
-## Run it
+## Run from a source checkout
 
-### Easiest on Windows
+### Interactive Windows launcher
 
 Double-click [`portdoc-launcher.cmd`](./portdoc-launcher.cmd). It explains when
 the tool is useful, asks for a port number, and keeps the result open so it can
@@ -80,19 +122,6 @@ From a terminal in this repository:
 .\portdoc.cmd 3000
 .\portdoc.cmd
 .\portdoc.cmd help
-```
-
-Run it without installing:
-
-```powershell
-npx portdoc 3000
-```
-
-Or install it globally to use the short command everywhere:
-
-```powershell
-npm install --global portdoc
-portdoc 3000
 ```
 
 Requirements:
