@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { parseDockerPorts } from "../src/collectors/docker.js";
+import { findDockerDesktopCli, parseDockerPorts } from "../src/collectors/docker.js";
 import { parseSsListeners, parseWslOutput } from "../src/collectors/wsl.js";
 import { parseNetstatListeners, parseWindowsListeners } from "../src/collectors/windows.js";
 
@@ -50,4 +50,13 @@ test("finds only Docker mappings matching the requested host port", () => {
   assert.equal(mappings.length, 2);
   assert.equal(mappings[0].container, "web");
   assert.equal(mappings[1].hostAddress, "[::]");
+});
+
+test("finds Docker Desktop even when docker is missing from PATH", () => {
+  const expected = "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe";
+  const found = findDockerDesktopCli({
+    environment: { ProgramFiles: "C:\\Program Files" },
+    existsSync: (candidate) => candidate === expected,
+  });
+  assert.equal(found, expected);
 });

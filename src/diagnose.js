@@ -7,7 +7,7 @@ import { probeWindows, probeWsl } from "./probes.js";
 export async function diagnose(port, options = {}) {
   const timeoutMs = options.timeoutMs ?? 4_000;
   const probeTimeoutMs = Math.min(timeoutMs, 1_500);
-  const collectorOptions = { timeoutMs, distro: options.distro };
+  const collectorOptions = { timeoutMs, distro: options.distro, dockerPath: options.dockerPath };
   const collectors = options.collectors ?? {};
 
   const [windows, wsl, docker] = await Promise.all([

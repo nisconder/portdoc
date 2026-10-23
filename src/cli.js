@@ -42,6 +42,7 @@ export function parseArgs(argv) {
     else if (value === "--json") options.json = true;
     else if (value === "--no-probe") options.probe = false;
     else if (value === "--distro" || value === "-d") options.distro = requireValue(argv, ++index, value);
+    else if (value === "--docker-path") options.dockerPath = requireValue(argv, ++index, value);
     else if (value === "--timeout") options.timeoutMs = parseTimeout(requireValue(argv, ++index, value));
     else if (value.startsWith("-")) throw new Error(`Unknown option: ${value}`);
     else positional.push(value);
@@ -86,6 +87,8 @@ Usage:
 
 Options:
   -d, --distro <name>  Inspect a specific WSL distribution
+      --docker-path <file>
+                       Use a specific Docker CLI executable
       --json           Emit the stable JSON report (schemaVersion 1)
       --no-probe       Do not make TCP reachability probes
       --timeout <ms>   Collector timeout, from 250 to 30000 (default: 4000)

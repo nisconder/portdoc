@@ -98,6 +98,7 @@
       "required": ["status", "mappings"],
       "properties": {
         "status": { "$ref": "#/$defs/sourceStatus" },
+        "executable": { "$ref": "#/$defs/nullableString" },
         "mappings": {
           "type": "array",
           "items": {

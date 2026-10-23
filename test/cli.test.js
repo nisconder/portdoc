@@ -4,10 +4,11 @@ import assert from "node:assert/strict";
 import { main, parseArgs } from "../src/cli.js";
 
 test("parses the port and supported options", () => {
-  assert.deepEqual(parseArgs(["3000", "--json", "--distro", "Ubuntu", "--no-probe", "--timeout", "900"]), {
+  assert.deepEqual(parseArgs(["3000", "--json", "--distro", "Ubuntu", "--docker-path", "C:\\Docker\\docker.exe", "--no-probe", "--timeout", "900"]), {
     port: 3000,
     json: true,
     distro: "Ubuntu",
+    dockerPath: "C:\\Docker\\docker.exe",
     probe: false,
     timeoutMs: 900,
   });

@@ -2,10 +2,28 @@
 
 > Find which process really owns a port across Windows, WSL and Docker.
 
-`wsl-port-doctor` is a read-only CLI for the frustrating case where the same
-port appears to exist in several networking layers at once. It combines
-Windows listeners, WSL listeners, Docker-published ports, and independent TCP
-reachability probes into one evidence-based report.
+Windows, WSL2, and Docker Desktop each have their own view of networking. A
+port can look free in one layer, be occupied in another, and be forwarded or
+shadowed before a connection reaches the service you expected.
+
+Use `wsl-port-doctor` when:
+
+- a development server fails with `EADDRINUSE`, but the process is hard to find;
+- `localhost:3000` opens the wrong application;
+- a service works inside WSL but cannot be reached from Windows;
+- Docker publishes a port, but Windows cannot connect to it; or
+- Windows, WSL, and Docker all appear to claim the same port.
+
+Give it one port number. It answers four separate questions:
+
+1. Which Windows process is listening?
+2. Which WSL process is listening?
+3. Which Docker container publishes the port?
+4. Can Windows and WSL actually open a TCP connection to it?
+
+It then explains whether the port is free, has one clear ownership path, is in
+conflict, or cannot be determined from the available evidence. It never kills
+a process or changes networking settings.
 
 ```text
 PORT 3000/TCP
@@ -31,16 +49,21 @@ Multiple independent layers claim this port.
 Confidence: high
 ```
 
-## Current status
+## Run it
 
-The dependency-free MVP is implemented and tested. It is not published to npm
-yet, so run it from the repository for now:
+### Easiest on Windows
+
+Double-click [`wsl-port-doctor.cmd`](./wsl-port-doctor.cmd). It explains when
+the tool is useful, asks for a port number, and keeps the result open so it can
+be read or screenshotted.
+
+From a terminal in this repository:
 
 ```powershell
-node .\bin\wsl-port-doctor.js 3000
+.\wsl-port-doctor.cmd 3000
 ```
 
-After an npm release, the intended command is:
+The package is not on npm yet. Once published, the primary command will be:
 
 ```powershell
 npx wsl-port-doctor 3000
@@ -57,12 +80,18 @@ Requirements:
 WSL and Docker are optional. If either is unavailable, the report says so and
 reduces its confidence instead of pretending that the port is free.
 
+Docker Desktop is discovered even when `docker.exe` is missing from `PATH`.
+The tool checks Docker Desktop's standard installation locations and clearly
+distinguishes “CLI not installed” from “CLI installed but daemon unavailable.”
+
 ## Usage
 
 ```text
 wsl-port-doctor <port> [options]
 
 -d, --distro <name>  Inspect a specific WSL distribution
+    --docker-path <file>
+                     Use a specific Docker CLI executable
     --json           Emit the stable JSON report (schemaVersion 1)
     --no-probe       Do not make TCP reachability probes
     --timeout <ms>   Collector timeout, from 250 to 30000
@@ -74,16 +103,16 @@ Examples:
 
 ```powershell
 # Inspect the default WSL distribution
-node .\bin\wsl-port-doctor.js 5173
+.\wsl-port-doctor.cmd 5173
 
 # Inspect Ubuntu specifically
-node .\bin\wsl-port-doctor.js 5173 --distro Ubuntu
+.\wsl-port-doctor.cmd 5173 --distro Ubuntu
 
 # Feed a stable report into another tool
-node .\bin\wsl-port-doctor.js 5173 --json
+.\wsl-port-doctor.cmd 5173 --json
 
 # Collect listener evidence without opening test connections
-node .\bin\wsl-port-doctor.js 5173 --no-probe
+.\wsl-port-doctor.cmd 5173 --no-probe
 ```
 
 ## Verdicts and exit codes
