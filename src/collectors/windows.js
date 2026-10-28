@@ -1,4 +1,5 @@
 import { runCommand } from "../lib/run-command.js";
+import { cleanIdentityText, processIdentity } from "../lib/identity.js";
 
 export function parseWindowsListeners(raw) {
   if (!raw) return [];
@@ -9,8 +10,9 @@ export function parseWindowsListeners(raw) {
     address: String(item.Address ?? ""),
     port: Number(item.Port),
     pid: Number(item.Pid),
-    process: item.ProcessName ? String(item.ProcessName) : null,
-    path: item.ProcessPath ? String(item.ProcessPath) : null,
+    process: cleanIdentityText(item.ProcessName),
+    path: cleanIdentityText(item.ProcessPath),
+    ...(Object.hasOwn(item, "CommandLine") ? processIdentity(item.CommandLine, null) : {}),
   }));
 }
 
@@ -71,7 +73,13 @@ export async function collectWindows(port, options = {}) {
     "    $process = Get-Process -Id $_ -ErrorAction Stop",
     "    $processPath = $null",
     "    try { $processPath = $process.Path } catch {}",
-    "    [PSCustomObject]@{ Pid = $_; ProcessName = $process.ProcessName; ProcessPath = $processPath }",
+    "    $commandLine = $null",
+    "    try {",
+    "      $cim = Get-CimInstance Win32_Process -Filter ('ProcessId = ' + $_) -ErrorAction Stop",
+    "      $commandLine = $cim.CommandLine",
+    "      if ($cim.ExecutablePath) { $processPath = $cim.ExecutablePath }",
+    "    } catch {}",
+    "    [PSCustomObject]@{ Pid = $_; ProcessName = $process.ProcessName; ProcessPath = $processPath; CommandLine = $commandLine }",
     "  }",
     "  catch { [PSCustomObject]@{ Pid = $_; ProcessName = $null; ProcessPath = $null } }",
     "})",
@@ -92,6 +100,10 @@ export async function collectWindows(port, options = {}) {
         if (process) {
           listener.process = process.process;
           listener.path = process.path;
+          listener.commandLine = process.commandLine ?? null;
+          listener.cwd = null;
+          listener.projectPath = process.projectPath ?? null;
+          listener.identitySource = process.identitySource ?? null;
         }
       }
     } catch {

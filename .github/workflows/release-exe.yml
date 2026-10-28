@@ -1,0 +1,59 @@
+name: Build Windows release assets
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag, for example v0.6.0
+        required: true
+        type: string
+      upload:
+        description: Upload assets to the existing GitHub release
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify the release tag matches the package version
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: node --input-type=module -e "import fs from 'node:fs'; const pkg=JSON.parse(fs.readFileSync('package.json','utf8')); if(process.env.RELEASE_TAG !== 'v'+pkg.version) throw new Error('Tag and package version differ');"
+      - run: node --test
+      - run: node scripts/build-exe.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portdoc-windows-x64-${{ inputs.tag }}
+          path: |
+            dist/portdoc-win-x64.exe
+            dist/portdoc-win-x64.zip
+            dist/SHA256SUMS.txt
+            dist/LICENSE-NODE.txt
+            dist/build-info.json
+  upload:
+    if: inputs.upload
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: portdoc-windows-x64-${{ inputs.tag }}
+          path: dist
+      - name: Upload to the existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release upload "$RELEASE_TAG" dist/portdoc-win-x64.exe dist/portdoc-win-x64.zip dist/SHA256SUMS.txt dist/LICENSE-NODE.txt dist/build-info.json

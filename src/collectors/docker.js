@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 
 import { runCommand } from "../lib/run-command.js";
+import { cleanIdentityText } from "../lib/identity.js";
 
 export function parseDockerPorts(raw, requestedPort, protocol = "tcp") {
   if (!raw) return [];
@@ -11,6 +12,7 @@ export function parseDockerPorts(raw, requestedPort, protocol = "tcp") {
     .map((line) => JSON.parse(line));
 
   return containers.flatMap((container) => {
+    const labels = parseLabels(container.Labels);
     const ports = String(container.Ports ?? "")
       .split(/,\s*/)
       .map(parsePublishedPort)
@@ -19,14 +21,26 @@ export function parseDockerPorts(raw, requestedPort, protocol = "tcp") {
 
     return ports.map((mapping) => ({
       containerId: String(container.ID ?? ""),
-      container: String(container.Names ?? ""),
-      image: String(container.Image ?? ""),
+      container: cleanIdentityText(container.Names) ?? "",
+      image: cleanIdentityText(container.Image) ?? "",
       hostAddress: mapping.hostAddress,
       hostPort: mapping.hostPort,
       containerPort: mapping.containerPort,
       protocol: mapping.protocol,
+      composeProject: cleanIdentityText(labels["com.docker.compose.project"]),
+      composeService: cleanIdentityText(labels["com.docker.compose.service"]),
+      projectPath: cleanIdentityText(labels["com.docker.compose.project.working_dir"]),
     }));
   });
+}
+
+function parseLabels(value) {
+  if (value && typeof value === "object" && !Array.isArray(value)) return value;
+  if (typeof value !== "string") return {};
+  return Object.fromEntries(value.split(",").flatMap((entry) => {
+    const separator = entry.indexOf("=");
+    return separator < 0 ? [] : [[entry.slice(0, separator), entry.slice(separator + 1)]];
+  }));
 }
 
 export async function collectDocker(port, options = {}) {

@@ -1,4 +1,5 @@
 import { diagnose } from "./diagnose.js";
+import { createDemoReport } from "./demo.js";
 import { formatText } from "./format.js";
 import { getHelpText } from "./help.js";
 import { createMessages, normalizeLanguage, resolveLanguage } from "./i18n.js";
@@ -29,7 +30,7 @@ export async function main(argv, dependencies = {}) {
     return 0;
   }
 
-  const report = await (dependencies.diagnose ?? diagnose)(options.port, options);
+  const report = options.demo ? createDemoReport() : await (dependencies.diagnose ?? diagnose)(options.port, options);
   const output = options.json
     ? JSON.stringify(report, null, 2)
     : formatText(report, {
@@ -38,7 +39,7 @@ export async function main(argv, dependencies = {}) {
         language,
       });
   (dependencies.stdout ?? console.log)(output);
-  return exitCodeFor(report.assessment.verdict);
+  return options.demo ? 0 : exitCodeFor(report.assessment.verdict);
 }
 
 export function parseArgs(argv) {
@@ -65,6 +66,7 @@ export function parseArgs(argv) {
   }
 
   if (options.help || options.version) return options;
+  if (positional.length === 1 && positional[0] === "demo") return { ...options, demo: true };
   if (positional.length !== 1) throw new Error("Provide exactly one TCP port number.");
   const port = Number(positional[0]);
   if (!Number.isInteger(port) || port < 1 || port > 65_535) {

@@ -52,3 +52,17 @@ test("explains the difference between a missing CLI and an unavailable daemon", 
   assert.match(result.reason, /engine is not running/);
   assert.doesNotMatch(result.reason, /WARNING/);
 });
+
+test("identifies the Compose project and service without inspecting unrelated containers", async () => {
+  let calls = 0;
+  const result = await collectDocker(5173, {
+    runCommand: async () => {
+      calls += 1;
+      return { exitCode: 0, stdout: JSON.stringify({ ID: "web-id", Names: "demo-web-1", Image: "demo-web", Ports: "0.0.0.0:5173->5173/tcp", Labels: "com.docker.compose.project=demo,com.docker.compose.service=web,com.docker.compose.project.working_dir=/home/me/demo" }) };
+    },
+  });
+  assert.equal(calls, 1);
+  assert.equal(result.mappings[0].composeProject, "demo");
+  assert.equal(result.mappings[0].composeService, "web");
+  assert.equal(result.mappings[0].projectPath, "/home/me/demo");
+});

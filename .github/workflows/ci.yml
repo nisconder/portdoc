@@ -1,0 +1,47 @@
+name: Windows tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run deterministic tests and local TCP probes
+        run: node --test
+      - name: Check the CLI entry point
+        run: node --check bin/portdoc.js
+
+  executable:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build the self-contained Windows EXE and run smoke checks
+        run: node scripts/build-exe.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portdoc-windows-x64
+          path: |
+            dist/portdoc-win-x64.exe
+            dist/portdoc-win-x64.zip
+            dist/SHA256SUMS.txt
+            dist/LICENSE-NODE.txt
+            dist/build-info.json
+          retention-days: 7

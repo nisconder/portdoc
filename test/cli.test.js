@@ -91,3 +91,20 @@ test("JSON mode returns conflict exit code and a machine-readable report", async
   assert.equal(exitCode, 1);
   assert.deepEqual(JSON.parse(writes[0]), report);
 });
+
+test("demo is offline, explicitly labeled, localized and exits successfully", async () => {
+  const writes = [];
+  const dependencies = {
+    stdout: (value) => writes.push(value),
+    diagnose: () => { throw new Error("demo must never query the machine"); },
+  };
+  assert.equal(await main(["demo", "--lang", "zh-CN"], dependencies), 0);
+  assert.match(writes[0], /模拟样例，未检查当前系统/);
+  writes.length = 0;
+  assert.equal(await main(["demo", "--json"], dependencies), 0);
+  const report = JSON.parse(writes[0]);
+  assert.equal(report.sample, true);
+  assert.equal(report.schemaVersion, 2);
+  assert.equal(report.endpointMatrix.windows.ipv4.reachable, true);
+  assert.equal(report.endpointMatrix.windows.ipv6.reachable, false);
+});

@@ -6,14 +6,14 @@ export function formatText(report, options = {}) {
   const messages = createMessages(options.language ?? "en");
   const lines = [
     `${paint.brand("PORTDOC")}  ${paint.muted(`${report.port}/tcp · ${report.target}`)}`,
+    ...(report.sample ? [paint.warn(messages.t("sample"))] : []),
     "",
     ...formatSummary(report, paint, width, messages),
+    ...(report.endpointMatrix ? ["", paint.section(messages.t("endpointMatrix")), ...formatMatrix(report.endpointMatrix, paint, width, messages)] : []),
     "",
     paint.section(messages.t("ownership")),
     ...formatOwnership(report, paint, width, messages),
-    "",
-    paint.section(`${messages.t("reachability")}  ${report.target}:${report.port}`),
-    ...formatReachability(report, paint, width, messages),
+    ...(!report.endpointMatrix ? ["", paint.section(`${messages.t("reachability")}  ${report.target}:${report.port}`), ...formatReachability(report, paint, width, messages)] : []),
   ];
 
   if (report.assessment.findings.length) {
@@ -39,7 +39,8 @@ function formatSummary(report, paint, width, messages) {
   const railWidth = Math.max(32, Math.min(74, width));
   const contentWidth = railWidth - 3;
   const verdict = report.assessment.verdict;
-  const verdictText = `${verdictSymbol(verdict)} ${messages.t(`verdict${verdict}`)}`;
+  const endpointMismatch = report.assessment.findings.some((finding) => ["ENDPOINT_FAMILY_MISMATCH", "LOCALHOST_RESOLUTION_MISMATCH"].includes(finding.code));
+  const verdictText = `${verdictSymbol(verdict)} ${messages.t(verdict === "UNKNOWN" && endpointMismatch ? "verdictEndpointMismatch" : `verdict${verdict}`)}`;
   const summaryLines = wrapText(localizedSummary(report, messages), contentWidth);
   const lines = [`╭─ ${paint.verdict(verdictText, verdict)}`];
   for (const line of summaryLines) lines.push(`│  ${paint.bold(line)}`);
@@ -69,8 +70,8 @@ function formatListenerSource(label, source, paint, width, messages) {
     return formatRow({ symbol: "○", label, primary: messages.t("noListener"), tone: "muted" }, paint, width);
   }
 
-  return source.listeners.flatMap((item, index) =>
-    formatRow(
+  return source.listeners.flatMap((item, index) => [
+    ...formatRow(
       {
         symbol: "●",
         label: index === 0 ? label : "",
@@ -81,7 +82,19 @@ function formatListenerSource(label, source, paint, width, messages) {
       paint,
       width,
     ),
-  );
+    ...formatIdentity(item, paint, width, messages),
+  ]);
+}
+
+function formatIdentity(item, paint, width, messages) {
+  const details = [];
+  if (item.projectPath && item.projectPath !== item.cwd) {
+    details.push(`${messages.t(item.identitySource === "commandLine" ? "inferredProject" : "projectPath")}: ${item.projectPath}`);
+  }
+  if (item.cwd) details.push(`${messages.t("workingDirectory")}: ${item.cwd}`);
+  if (item.commandLine) details.push(`${messages.t("commandLine")}: ${item.commandLine}`);
+  else if (item.path) details.push(`${messages.t("executable")}: ${item.path}`);
+  return details.flatMap((detail) => wrapText(detail, width - 6).map((line) => `      ${paint.muted(line)}`));
 }
 
 function formatDocker(source, paint, width, messages) {
@@ -96,8 +109,8 @@ function formatDocker(source, paint, width, messages) {
     return formatRow({ symbol: "○", label: messages.t("docker"), primary: messages.t("noMapping"), tone: "muted" }, paint, width);
   }
 
-  return source.mappings.flatMap((item, index) =>
-    formatRow(
+  return source.mappings.flatMap((item, index) => [
+    ...formatRow(
       {
         symbol: "●",
         label: index === 0 ? messages.t("docker") : "",
@@ -108,7 +121,57 @@ function formatDocker(source, paint, width, messages) {
       paint,
       width,
     ),
-  );
+    ...(item.composeProject || item.composeService ? wrapText(`${messages.t("composeService")}: ${[item.composeProject, item.composeService].filter(Boolean).join(" / ")}`, width - 6).map((line) => `      ${paint.muted(line)}`) : []),
+    ...(item.projectPath ? wrapText(`${messages.t("projectPath")}: ${item.projectPath}`, width - 6).map((line) => `      ${paint.muted(line)}`) : []),
+  ]);
+}
+
+function formatMatrix(matrix, paint, width, messages) {
+  const rows = [["localhost", "localhost"], ["127.0.0.1", "ipv4"], ["[::1]", "ipv6"]];
+  const lines = [];
+  if (width >= 64) {
+    const columnWidth = Math.floor((width - 18) / 2);
+    lines.push(`  ${padDisplay(messages.t("endpoint"), 16)}${padDisplay("Windows", columnWidth)}WSL`);
+    for (const [label, key] of rows) {
+      const left = matrixCell(matrix.windows[key], messages);
+      const right = matrixCell(matrix.wsl[key], messages);
+      lines.push(`  ${padDisplay(label, 16)}${paint[left.tone](padDisplay(left.text, columnWidth))}${paint[right.tone](right.text)}`);
+    }
+  } else {
+    for (const [label, key] of rows) {
+      lines.push(`  ${paint.bold(label)}`);
+      for (const side of ["windows", "wsl"]) {
+        const cell = matrixCell(matrix[side][key], messages);
+        lines.push(`    ${padDisplay(messages.t(side), 8)} ${paint[cell.tone](cell.text)}`);
+      }
+    }
+  }
+  const resolutions = ["windows", "wsl"].flatMap((side) => matrix[side].localhost.address ? [`${messages.t(side)} ${matrix[side].localhost.address}`] : []);
+  if (resolutions.length) lines.push(...wrapText(`${messages.t("resolvedTo")}: ${resolutions.join(" · ")}`, width - 2).map((line) => `  ${paint.muted(line)}`));
+  for (const side of ["windows", "wsl"]) {
+    const reasons = new Map();
+    for (const [label, key] of rows) {
+      const probe = matrix[side][key];
+      if (["error", "unavailable"].includes(probe.status) && probe.reason) {
+        const labels = reasons.get(probe.reason) ?? [];
+        labels.push(label);
+        reasons.set(probe.reason, labels);
+      }
+    }
+    for (const [reason, labels] of reasons) lines.push(...wrapText(`${messages.t(side)} ${labels.join(" / ")}: ${localizeReason(reason, messages)}`, width - 2).map((line) => `  ${paint.muted(line)}`));
+  }
+  lines.push(...wrapText(messages.t("matrixNote"), width - 2).map((line) => `  ${paint.muted(line)}`));
+  return lines;
+}
+
+function matrixCell(probe, messages) {
+  if (probe.reachable === true) return { text: `✓ ${probe.latencyMs ?? "?"} ms`, tone: "good" };
+  if (probe.reachable === false) {
+    const timedOut = /timed? ?out|timeout/i.test(probe.reason ?? "");
+    const refused = /refused|ECONNREFUSED/i.test(probe.reason ?? "");
+    return { text: `× ${timedOut ? messages.t("timedOut") : refused ? messages.t("refused") : messages.t("notReachable")}`, tone: "bad" };
+  }
+  return { text: `${probe.status === "skipped" ? "—" : "!"} ${statusLabel(probe.status, messages)}`, tone: probe.status === "skipped" ? "muted" : "warn" };
 }
 
 function formatReachability(report, paint, width, messages) {
@@ -190,6 +253,13 @@ function buildNextSteps(report, messages) {
   const { windows, wsl, docker } = report.sources;
   const findingCodes = new Set(report.assessment.findings.map((finding) => finding.code));
 
+  if (findingCodes.has("LOCALHOST_RESOLUTION_MISMATCH")) steps.add(messages.t("nextLocalhost"));
+  if (findingCodes.has("ENDPOINT_FAMILY_MISMATCH")) steps.add(messages.t("nextIpv4"));
+  if (findingCodes.has("LOCALHOST_RESOLUTION_MISMATCH") || findingCodes.has("ENDPOINT_FAMILY_MISMATCH")) {
+    const working = report.endpointMatrix?.windows.ipv4.reachable ? "127.0.0.1" : report.endpointMatrix?.windows.ipv6.reachable ? "::1" : null;
+    if (working) steps.add(`Test-NetConnection -ComputerName ${working} -Port ${report.port}`);
+  }
+
   if (docker.status !== "ok") {
     if (/engine is not running|cannot be accessed/i.test(docker.reason ?? "")) {
       steps.add(messages.t("nextDockerStart"));
@@ -248,9 +318,10 @@ function verdictSymbol(verdict) {
 
 function localizedSummary(report, messages) {
   const { verdict } = report.assessment;
-  if (verdict === "FREE") return messages.t("summaryFREE");
+  if (verdict === "FREE") return messages.t(report.probes.windows.status === "skipped" ? "summaryFreeSkipped" : "summaryFREE");
   if (verdict === "CONFLICT") return messages.t("summaryCONFLICT");
   if (verdict === "UNKNOWN") {
+    if (report.assessment.findings.some((finding) => ["LOCALHOST_RESOLUTION_MISMATCH", "ENDPOINT_FAMILY_MISMATCH"].includes(finding.code))) return messages.t("summaryEndpointMismatch");
     if (report.assessment.findings.some((finding) => finding.code === "WSL_NOT_REACHABLE_FROM_WINDOWS")) {
       return messages.t("summaryWslForwarding");
     }
@@ -270,7 +341,8 @@ function localizedSummary(report, messages) {
 function localizedFinding(finding, messages) {
   const key = `finding${finding.code}`;
   const translated = messages.t(key);
-  return translated === key ? finding.message : translated;
+  const text = translated === key ? finding.message : translated;
+  return finding.side && translated !== key ? `${messages.t(finding.side)}: ${text}` : text;
 }
 
 function localizeReason(reason, messages) {
@@ -279,6 +351,8 @@ function localizeReason(reason, messages) {
   if (/Docker CLI was not found/i.test(reason)) return messages.t("reasonDockerMissing");
   if (/E_ACCESSDENIED/i.test(reason)) return messages.t("reasonWslAccess");
   if (/Disabled by --no-probe/i.test(reason)) return messages.t("reasonProbeDisabled");
+  if (/ECONNREFUSED|Connection refused\.?$/i.test(reason)) return messages.t("reasonProbeRefused");
+  if (/Connection timed out/i.test(reason)) return messages.t("reasonProbeTimeout");
   return reason;
 }
 
@@ -295,11 +369,16 @@ function normalizeWidth(value) {
 function wrapText(value, width) {
   const text = String(value ?? "").trim();
   if (!text) return [];
-  const words = text.split(/\s+/);
+  const words = text.match(/\s+|[\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\uff00-\uffef]|[^\s\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\uff00-\uffef]+/gu) ?? [];
   const lines = [];
   let line = "";
+  let pendingSpace = "";
 
-  for (const word of words) {
+  for (const [index, word] of words.entries()) {
+    if (/^\s+$/.test(word)) {
+      pendingSpace = line ? " " : "";
+      continue;
+    }
     if (displayWidth(word) > width) {
       if (line) {
         lines.push(line);
@@ -310,12 +389,13 @@ function wrapText(value, width) {
       line = chunks.at(-1) ?? "";
     } else if (!line) {
       line = word;
-    } else if (displayWidth(line) + displayWidth(word) + 1 <= width) {
-      line += ` ${word}`;
+    } else if (displayWidth(line) + displayWidth(word) + pendingSpace.length <= width - (/^[，。！？；：、）】》」』]$/.test(words[index + 1] ?? "") ? 2 : 0)) {
+      line += `${pendingSpace}${word}`;
     } else {
       lines.push(line);
       line = word;
     }
+    pendingSpace = "";
   }
   if (line) lines.push(line);
   return lines;

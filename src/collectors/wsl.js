@@ -1,4 +1,5 @@
 import { runCommand } from "../lib/run-command.js";
+import { cleanIdentityText, processIdentity } from "../lib/identity.js";
 
 const DISTRO_MARKER = "__WPD_DISTRO__";
 
@@ -54,7 +55,7 @@ export async function collectWsl(port, options = {}) {
   ].join("; ");
   const args = [];
   if (options.distro) args.push("--distribution", options.distro);
-  args.push("--", "sh", "-lc", script);
+  args.push("--", "sh", "-c", script);
 
   const result = await (options.runCommand ?? runCommand)("wsl.exe", args, {
     timeoutMs: options.timeoutMs,
@@ -84,7 +85,55 @@ export async function collectWsl(port, options = {}) {
   }
 
   const parsed = parseWslOutput(result.stdout);
+  await enrichWslIdentity(parsed.listeners, options);
   return { status: "ok", ...parsed };
+}
+
+async function enrichWslIdentity(listeners, options) {
+  const processIds = [...new Set(listeners.map((item) => item.pid).filter((pid) => Number.isSafeInteger(pid) && pid > 0))];
+  if (!processIds.length) return;
+  // The second call reads only PIDs already reported by ss. Do not use root,
+  // source environment files, or evaluate anything read from /proc.
+  const python = [
+    "import json,os,shlex,sys",
+    "items=[]",
+    "for value in sys.argv[1:]:",
+    " p=int(value); row={'pid':p,'commandLine':None,'cwd':None,'path':None}",
+    " try:",
+    "  with open('/proc/%d/cmdline'%p,'rb') as stream: args=[v.decode('utf-8','replace') for v in stream.read(65536).split(b'\\0') if v]",
+    "  row['commandLine']=shlex.join(args)",
+    " except OSError: pass",
+    " for field in ('cwd','exe'):",
+    "  try: row['path' if field=='exe' else field]=os.readlink('/proc/%d/%s'%(p,field))",
+    "  except OSError: pass",
+    " items.append(row)",
+    "print(json.dumps(items,ensure_ascii=False))",
+  ].join("\n");
+  const script = `if command -v python3 >/dev/null 2>&1; then python3 -c ${shellQuote(python)} ${processIds.join(" ")}; else exit 127; fi`;
+  const args = [];
+  if (options.distro) args.push("--distribution", options.distro);
+  args.push("--", "sh", "-c", script);
+  try {
+    const result = await (options.runCommand ?? runCommand)("wsl.exe", args, { timeoutMs: options.timeoutMs });
+    if (result.exitCode !== 0) return;
+    const metadata = JSON.parse(result.stdout);
+    if (!Array.isArray(metadata)) return;
+    const byPid = new Map(metadata.map((item) => [Number(item.pid), item]));
+    for (const listener of listeners) {
+      const item = byPid.get(listener.pid);
+      if (!item) continue;
+      Object.assign(listener, processIdentity(item.commandLine, item.cwd, "linux"));
+      listener.path = cleanIdentityText(item.path);
+      if (listener.commandLine || listener.cwd || listener.path) listener.identitySource = "proc";
+    }
+  } catch {
+    // Missing Python, permission restrictions and short-lived processes do
+    // not invalidate the listener evidence already captured by ss.
+  }
+}
+
+function shellQuote(value) {
+  return `'${value.replace(/'/g, `'"'"'`)}'`;
 }
 
 function parseEndpoint(value) {

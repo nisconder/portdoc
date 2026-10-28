@@ -9,8 +9,8 @@ function englishHelp() {
 
 ABOUT
   Windows, WSL2 and Docker Desktop do not share one simple port table.
-  portdoc combines their listener and port-mapping evidence, then checks
-  whether Windows and WSL can actually connect to the requested port.
+  portdoc combines listener and project identity evidence, then compares
+  localhost, 127.0.0.1 and ::1 from both Windows and WSL.
 
   Use it when a server reports EADDRINUSE, localhost opens the wrong app,
   a WSL service is unreachable from Windows, or a Docker-published port does
@@ -19,6 +19,7 @@ ABOUT
 USAGE
   portdoc                            Show this help
   portdoc <port> [options]
+  portdoc demo [--lang en|zh-CN]      Simulated example; no system checks
   portdoc help [--lang en|zh-CN]
   portdoc --version
 
@@ -36,17 +37,19 @@ EXAMPLES
   portdoc 3000 --timeout 10000      Allow slower collectors ten seconds
 
 WHAT GETS CHECKED
-  Windows              Listening address, PID, process name and executable
-  WSL                  Listening address, PID and process from ss
-  Docker               Published host port, container port, name and image
-  Reachability         TCP connection from Windows and separately from WSL
+  Windows              Listener, PID, executable and redacted command line
+  WSL                  Listener, PID, /proc command line and working directory
+  Docker               Published ports, Compose project/service and path
+  Endpoint matrix      localhost / 127.0.0.1 / ::1 from Windows and WSL
+                       localhost tests the first resolved address, without
+                       IPv4/IPv6 fallback. Browsers may select differently.
 
 OPTIONS
   -d, --distro <name>  Inspect this WSL distribution instead of the default
       --docker-path <file>
                        Use this Docker CLI instead of automatic discovery
   -l, --lang <locale>  Interface language: auto, en, or zh-CN (default: auto)
-      --json           Emit language-neutral JSON matching the report schema
+      --json           Emit language-neutral JSON (schemaVersion 2)
       --color          Always use terminal colors
       --no-color       Never use terminal colors
       --no-probe       Collect ownership evidence without opening TCP probes
@@ -56,9 +59,9 @@ OPTIONS
 
 VERDICTS
   FREE                 Every collector succeeded and found no owner
-  OK                   One effective ownership path was identified
-  CONFLICT             Independent Windows, WSL or Docker layers claim it
-  UNKNOWN              Evidence is unavailable, incomplete or contradictory
+  OK                   An owner was found and no issue was observed
+  CONFLICT             Potential overlap across layers; review the evidence
+  UNKNOWN              Evidence is incomplete or endpoints behave differently
 
 EXIT CODES
   0                    FREE or OK
@@ -69,6 +72,15 @@ SAFETY AND LIMITS
   portdoc is read-only. It never kills a process or changes networking.
   A successful TCP probe proves reachability, not which process accepted the
   connection. The current release inspects TCP only, not UDP.
+  A single-family bind can be intentional. Neither a port overlap nor an
+  IPv4/IPv6 difference proves a forwarding fault or the accepting process.
+  Windows working directories are not available via this collector; project
+  paths inferred from absolute script arguments are explicitly labeled.
+
+WINDOWS STANDALONE
+  Download portdoc-win-x64.zip from github.com/nisconder/portdoc/releases.
+  Extract it, open a terminal there and run .\\portdoc.exe.
+  Node.js is not needed for the EXE. The npm package needs Node.js >=18.
 
 FROM THIS SOURCE CHECKOUT
   .\\portdoc.cmd <port>               Run with an explicit port
@@ -81,8 +93,8 @@ function chineseHelp() {
 
 作用
   Windows、WSL2 和 Docker Desktop 并不共享一张简单的端口表。
-  portdoc 会合并三者的监听和端口映射证据，并分别检查 Windows 与 WSL
-  是否真的能够连接到指定端口。
+  portdoc 会合并监听、项目路径和端口映射证据，并从 Windows 和 WSL
+  分别对比 localhost、127.0.0.1 和 ::1 的连接结果。
 
   适用于 EADDRINUSE、localhost 打开了错误程序、WSL 服务无法从 Windows
   访问，或者 Docker 已发布端口但连接行为不符合预期等情况。
@@ -90,6 +102,7 @@ function chineseHelp() {
 用法
   portdoc                            显示此帮助
   portdoc <端口> [选项]
+  portdoc demo [--lang en|zh-CN]      模拟样例，不检查当前系统
   portdoc help [--lang en|zh-CN]
   portdoc --version
 
@@ -107,17 +120,19 @@ function chineseHelp() {
   portdoc 3000 --timeout 10000      将采集超时设为十秒
 
 检查内容
-  Windows              监听地址、PID、进程名和可执行文件
-  WSL                  通过 ss 读取监听地址、PID 和进程
-  Docker               主机端口、容器端口、容器名和镜像
-  可达性                分别从 Windows 和 WSL 发起 TCP 连接
+  Windows              监听地址、PID、程序和脱敏后的命令行
+  WSL                  监听地址、PID、/proc 命令行和工作目录
+  Docker               映射端口、Compose 项目、服务和项目路径
+  端点矩阵              两侧分别测试 localhost / 127.0.0.1 / ::1
+                       localhost 仅测试首选解析地址，不自动回退到另一地址族。
+                       浏览器的地址选择可能与本次探测不同。
 
 选项
   -d, --distro <名称>  检查指定 WSL 发行版，而不是默认发行版
       --docker-path <文件>
                        使用指定 Docker CLI，不进行自动发现
   -l, --lang <语言>    界面语言：auto、en 或 zh-CN（默认：auto）
-      --json           输出不受界面语言影响的 JSON 报告
+      --json           输出不受语言影响的 JSON（schemaVersion 2）
       --color          始终使用终端颜色
       --no-color       禁用终端颜色
       --no-probe       收集端口归属，但不发起 TCP 连接
@@ -127,9 +142,9 @@ function chineseHelp() {
 
 诊断结果
   FREE                 所有检查完成，未发现占用者
-  OK                   找到一条明确的端口归属路径
-  CONFLICT             Windows、WSL 或 Docker 存在独立的重复声明
-  UNKNOWN              证据缺失、不完整或相互矛盾
+  OK                   已发现归属，未观察到异常
+  CONFLICT             多层可能存在重叠，请核对证据
+  UNKNOWN              部分证据缺失或不同端点的行为有差异
 
 退出码
   0                    FREE 或 OK
@@ -139,6 +154,14 @@ function chineseHelp() {
 安全边界
   portdoc 只读运行，不会结束进程或修改网络设置。TCP 探测成功只能证明
   端口可达，不能单独证明由哪个进程接受了连接。当前版本仅检查 TCP。
+  仅绑定单个地址族可能是预期行为。端口重叠或 IPv4/IPv6 差异不能单独
+  证明转发故障。Windows 无法读取工作目录；从绝对脚本路径推断出的
+  项目目录会明确标注来源。
+
+Windows 独立版
+  从 github.com/nisconder/portdoc/releases 下载 portdoc-win-x64.zip。
+  解压后在该目录打开终端，运行 .\\portdoc.exe；无需安装 Node.js。
+  npm 安装方式需要 Node.js >=18。
 
 在源码目录运行
   .\\portdoc.cmd <端口>               检查指定端口

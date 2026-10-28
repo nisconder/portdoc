@@ -1,7 +1,7 @@
 {
   "name": "portdoc",
-  "version": "0.5.3",
-  "description": "Find which process really owns a port across Windows, WSL and Docker.",
+  "version": "0.6.0",
+  "description": "Explain localhost TCP reachability and port ownership across Windows, WSL and Docker.",
   "type": "module",
   "bin": {
     "portdoc": "bin/portdoc.js"
@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node ./bin/portdoc.js",
     "test": "node --test",
-    "check": "node --check ./bin/portdoc.js"
+    "check": "node --check ./bin/portdoc.js",
+    "build:exe": "node scripts/build-exe.mjs"
   },
   "engines": {
     "node": ">=18"
@@ -25,6 +26,8 @@
     "portdoc-launcher.cmd",
     "portdoc.ps1",
     "README.md",
+    "README.zh-CN.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "keywords": [
