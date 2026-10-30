@@ -4,6 +4,7 @@
 
 同时对比 IPv4、IPv6 和 localhost 的 TCP 连接结果，并显示监听进程、
 项目路径和 Docker Compose 服务。
+用 `portdoc scan` 先发现端口，再检查具体端口及 Windows TCP 排除范围。
 
 [English](README.md) · [下载 Windows 独立版](https://github.com/nisconder/portdoc/releases/latest) · [npm](https://www.npmjs.com/package/portdoc)
 
@@ -59,12 +60,15 @@ npm install --global portdoc@latest --registry=https://registry.npmjs.org/
 
 ## 能解决什么问题
 
+- 不知道查哪个端口时，用 `scan` 一次汇总三层监听和映射，标出可能重叠项。
+- 用 `doctor` 检查本机采集环境，区分必需的 Windows 查询与可选的 WSL/Docker。
 - 对比 Windows、WSL 两侧的 `localhost`、`127.0.0.1`、`::1` 是否可以连接。
 - 显示 localhost 实际采用的首选解析地址，解释地址族差异。
 - Windows 显示 PID、程序和脱敏命令行；有绝对脚本路径时推断项目目录。
 - WSL 读取 `/proc` 获取实际工作目录、可执行文件和命令行。
 - Docker 显示映射端口、镜像及 Compose 项目、服务、目录标签。
 - 根据证据给出下一步检查建议和可复制的验证命令。
+- 检查包含目标端口的 Windows IPv4/IPv6 TCP 排除范围，解释潜在绑定限制。
 
 Windows 无法读取实际工作目录，推断路径会明确标注。WSL 详细身份信息需要
 Python 3 和进程访问权限，缺少时仍保留基本 `ss` 监听证据。
@@ -74,16 +78,42 @@ Docker Compose 信息取决于容器标签。
 
 ```powershell
 portdoc                             # 完整帮助
+portdoc scan                        # 默认显示前 30 个已观察端口
+portdoc scan --issues-only          # 仅查看跨层可能重叠项
+portdoc scan --limit 100 --json     # 显示更多端口，保留完整计数
+portdoc doctor                      # 检查本机采集环境
+portdoc scan --help                 # scan 专属帮助
 portdoc demo --lang zh-CN            # 离线模拟样例
 portdoc 8080 --distro Ubuntu         # 指定 WSL 发行版
 portdoc 5173 --lang zh-CN            # 中文
 portdoc 5173 --lang en               # 英文
 portdoc 5432 --no-probe              # 仅采集归属，不发起 TCP 连接
-portdoc 5173 --json                  # 语言无关 JSON，schemaVersion 2
+portdoc 5173 --json                  # 语言无关诊断 JSON，schemaVersion 3
 ```
 
 端口可取 `1` 到 `65535`；`5173` 只是示例。默认跟随系统语言，可用
 `$env:PORTDOC_LANG = "zh-CN"` 设置当前 PowerShell 会话偏好。
+
+## 排查流程
+
+`doctor` 不启动 WSL 发行版或 Docker，仅检查本机环境。Windows 查询可用时
+退出码为 0，可选组件仍可能有警告；必需检查失败时为 2。
+
+`scan` 每层枚举一次，不逐个连接全端口。查询默认或所选 WSL 发行版时，系统
+可能启动该发行版。`--limit` 为 1 到 500，限制包括 JSON 在内的 `ports` 列表；
+`totalPorts`、`overlapCount`、`truncated` 反映截断前计数，JSON `sources` 保留原证据。
+完整列表有可能重叠时退出码为 1，否则检查不完整为 2，完整且无重叠为 0。
+scan 不检查可达性或保留范围，需要进一步运行 `portdoc <端口>`。
+
+Docker 仅通过本机 `docker_engine` 或 `dockerDesktopLinuxEngine` named pipe 查询，
+不会将远程 Docker context 中的端口映射混入本机结果，也不修改 Docker 配置。
+
+检查单个端口时，同时读取 Windows IPv4/IPv6 TCP 排除范围。无监听但命中排除
+范围会显示 `UNKNOWN` 和范围证据。命中并不表示必然无法绑定，也不能证明有
+进程占用；已有监听和范围并存也不会自动判为冲突。
+
+只读验证命令会指向实际 PID、WSL 发行版、容器和命中范围。命令只展示，不会
+自动执行；窄终端折行时，可从 JSON `nextActions` 取得完整命令字符串。
 
 ## 结果边界
 
@@ -92,7 +122,7 @@ portdoc 5173 --json                  # 语言无关 JSON，schemaVersion 2
 | FREE | 0 | 所有采集完成，未发现监听、映射或可连接端点 |
 | OK | 0 | 发现归属，未观察到需要处理的异常 |
 | CONFLICT | 1 | 多层可能重叠，需要核对是否属于同一服务 |
-| UNKNOWN | 2 | 部分检查未完成，或 localhost 失败而直接地址可达 |
+| UNKNOWN | 2 | 部分检查未完成、地址可达性异常，或无监听但命中排除范围 |
 
 服务只绑定 IPv4 可能是正常配置。localhost 仅测试首选解析地址，不自动回退；
 浏览器的选择可能不同。TCP 可以连接也不能证明哪个应用最终接收了连接。
@@ -101,7 +131,7 @@ WSL 或 Docker 无法检查时，不会把未检查的端口冒报为空闲。
 工具只读运行，不会结束进程、修改网络或上传报告。常见密钥参数会脱敏，
 但路径和命令行仍可能包含私人信息，分享前请复查。
 
-本版尚未包含：全端口扫描、HTTP 指纹、网络模式识别、Windows 保留端口检查、
+本版尚未包含：主动逐端口探测、HTTP 指纹、网络模式识别、
 自动修复、UDP、Podman 和 `wslc`。
 
 开发与 EXE 构建请参阅 [英文说明](README.md#development) 和

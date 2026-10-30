@@ -1,5 +1,6 @@
 """Render the real offline CUI output into an explicitly labeled demo GIF."""
 import argparse
+import json
 import os
 import re
 from pathlib import Path
@@ -10,6 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parent.parent
+VERSION = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
 parser = argparse.ArgumentParser()
 parser.add_argument("--node", default=shutil.which("node") or "node")
 parser.add_argument("--font", default=str(Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts/DejaVuSansMono.ttf"))
@@ -39,7 +41,7 @@ def render(shown, scroll=0):
     draw.rounded_rectangle((12, 12, width - 12, height - 12), radius=16, fill=background, outline="#2c394d", width=2)
     for x, color in ((39, "#e98686"), (63, "#d7b76b"), (87, "#6ebd8b")):
         draw.ellipse((x, 34, x + 11, 45), fill=color)
-    draw.text((120, 26), "portdoc 0.6  /  Windows + WSL + Docker", font=small, fill=muted)
+    draw.text((120, 26), f"portdoc {VERSION}  /  Windows + WSL + Docker", font=small, fill=muted)
     draw.text((36, 73), "PS> portdoc demo --lang en", font=font, fill=cyan)
     if scroll:
         draw.text((36, 111), f"... {scroll} preceding lines", font=small, fill=muted)

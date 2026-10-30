@@ -7,6 +7,7 @@ const collectors = {
   windows: async () => ({ status: "ok", listeners: [] }),
   wsl: async () => ({ status: "ok", listeners: [], distro: "Ubuntu" }),
   docker: async () => ({ status: "ok", mappings: [] }),
+  reservations: async () => ({ status: "ok", ranges: [], matches: [], families: { ipv4: { status: "ok" }, ipv6: { status: "ok" } } }),
 };
 
 function matrix() {
@@ -17,7 +18,7 @@ function matrix() {
   };
 }
 
-test("emits schema v2 endpoint matrices while retaining the IPv4 compatibility probes", async () => {
+test("emits schema v3 with exclusions and verification commands, retaining IPv4 aliases", async () => {
   const calls = [];
   const report = await diagnose(5173, {
     collectors,
@@ -28,7 +29,10 @@ test("emits schema v2 endpoint matrices while retaining the IPv4 compatibility p
       wsl: async (port, options) => { calls.push(["wsl", port, options]); return matrix(); },
     },
   });
-  assert.equal(report.schemaVersion, 2);
+  assert.equal(report.schemaVersion, 3);
+  assert.equal(report.kind, "diagnosis");
+  assert.equal(report.reservations.status, "ok");
+  assert.deepEqual(report.nextActions, []);
   assert.equal(report.target, "127.0.0.1");
   assert.deepEqual(report.endpointMatrix, { windows: matrix(), wsl: matrix() });
   assert.equal(report.probes.windows, report.endpointMatrix.windows.ipv4);

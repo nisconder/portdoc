@@ -1,6 +1,6 @@
 {
   "name": "portdoc",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Explain localhost TCP reachability and port ownership across Windows, WSL and Docker.",
   "type": "module",
   "bin": {

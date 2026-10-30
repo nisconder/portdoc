@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0
+
+- Add `portdoc scan` to inventory observed TCP listeners and mappings once per layer.
+- Add `--issues-only`, bounded `--limit`, total/overlap counts and explicit truncation.
+- Add `portdoc doctor` for Windows collector readiness and optional WSL/local Docker health.
+- Check active Windows IPv4/IPv6 excluded TCP ranges during single-port inspection.
+- Add read-only verification commands tied to actual PIDs, containers and range matches.
+- Scope Docker queries to local named pipes, ignoring remote Docker environment/context.
+- Preserve partial inventory and exclusion evidence without declaring uninspected ports free.
+- Add command-specific bilingual help and separate scan/doctor JSON contracts.
+- Diagnosis reports use schemaVersion 3; frozen v1/v2 schemas and IPv4 aliases remain available.
+
 ## 0.6.0
 
 - Compare localhost, IPv4 loopback and IPv6 loopback from Windows and WSL.

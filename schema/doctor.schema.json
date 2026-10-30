@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "doctor.schema.json",
+  "title": "portdoc environment report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "checkedAt",
+    "checks",
+    "ready"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "doctor"
+    },
+    "checkedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ready": {
+      "type": "boolean"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "code",
+          "detail"
+        ],
+        "properties": {
+          "id": {
+            "enum": [
+              "platform",
+              "windows",
+              "wsl",
+              "docker"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "warning",
+              "error"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

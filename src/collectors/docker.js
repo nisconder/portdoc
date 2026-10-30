@@ -4,6 +4,11 @@ import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 import { cleanIdentityText } from "../lib/identity.js";
 
+const LOCAL_ENGINE_ENDPOINTS = [
+  "npipe:////./pipe/docker_engine",
+  "npipe:////./pipe/dockerDesktopLinuxEngine",
+];
+
 export function parseDockerPorts(raw, requestedPort, protocol = "tcp") {
   if (!raw) return [];
   const containers = raw
@@ -15,9 +20,10 @@ export function parseDockerPorts(raw, requestedPort, protocol = "tcp") {
     const labels = parseLabels(container.Labels);
     const ports = String(container.Ports ?? "")
       .split(/,\s*/)
+      .map((value) => value.trim())
       .map(parsePublishedPort)
       .filter(Boolean)
-      .filter((mapping) => mapping.hostPort === requestedPort && mapping.protocol === protocol);
+      .filter((mapping) => (requestedPort == null || mapping.hostPort === requestedPort) && mapping.protocol === protocol);
 
     return ports.map((mapping) => ({
       containerId: String(container.ID ?? ""),
@@ -44,46 +50,94 @@ function parseLabels(value) {
 }
 
 export async function collectDocker(port, options = {}) {
-  const runner = options.runCommand ?? runCommand;
-  const args = ["ps", "--no-trunc", "--format", "{{json .}}"];
-  let executable = options.dockerPath ?? "docker";
-  let result = await runner(executable, args, { timeoutMs: options.timeoutMs });
+  return queryDocker(port, options);
+}
 
-  if (result.missing && !options.dockerPath) {
-    const fallback = findDockerDesktopCli(options);
-    if (fallback) {
-      executable = fallback;
-      result = await runner(executable, args, { timeoutMs: options.timeoutMs });
+export async function inventoryDocker(options = {}) {
+  return queryDocker(undefined, options);
+}
+
+async function queryDocker(port, options) {
+  const runner = options.runCommand ?? runCommand;
+  let executable = options.dockerPath ?? "docker";
+  // Windows ownership evidence must come from this machine. An inherited
+  // production/SSH context would otherwise turn a remote mapping into a false
+  // local conflict. Explicit local pipes and a per-child environment avoid
+  // changing the user's selected Docker context or shell environment.
+  const environment = { ...process.env, ...options.environment };
+  for (const key of Object.keys(environment)) {
+    if (["DOCKER_HOST", "DOCKER_CONTEXT"].includes(key.toUpperCase())) delete environment[key];
+  }
+  const deadline = performance.now() + (options.timeoutMs ?? 4_000);
+  const failures = [];
+
+  for (const [index, endpoint] of LOCAL_ENGINE_ENDPOINTS.entries()) {
+    const args = ["--host", endpoint, "ps", "--no-trunc", "--format", "{{json .}}"];
+    const queryOptions = () => ({
+      timeoutMs: Math.max(1, Math.floor((deadline - performance.now()) / (LOCAL_ENGINE_ENDPOINTS.length - index))),
+      spawnOptions: { env: environment },
+    });
+    let result = await runner(executable, args, queryOptions());
+    if (result.missing && !options.dockerPath) {
+      const fallback = findDockerDesktopCli(options);
+      if (fallback) {
+        executable = fallback;
+        result = await runner(executable, args, queryOptions());
+      }
+    }
+    if (result.missing) {
+      return {
+        status: "unavailable",
+        executable: null,
+        endpoint: null,
+        mappings: [],
+        reason: options.dockerPath
+          ? `Docker CLI was not found at ${options.dockerPath}.`
+          : "Docker CLI was not found in PATH or Docker Desktop's standard install locations.",
+      };
+    }
+    if (result.timedOut || result.exitCode !== 0) {
+      failures.push(result);
+      continue;
+    }
+    try {
+      const mappings = parseDockerPorts(result.stdout, port);
+      const unsupported = unsupportedPublishedMappings(result.stdout, port);
+      if (unsupported) {
+        return {
+          status: "error",
+          executable,
+          endpoint,
+          mappings,
+          reason: `Docker returned ${unsupported} unsupported published TCP mapping(s), including port ranges; these entries are omitted from the report.`,
+        };
+      }
+      return { status: "ok", executable, endpoint, mappings };
+    } catch {
+      return { status: "error", executable, endpoint, mappings: [], reason: "Docker returned unreadable container data." };
     }
   }
+  return {
+    status: failures.some((failure) => failure.timedOut) ? "error" : "unavailable",
+    executable,
+    endpoint: null,
+    mappings: [],
+    reason: failures.some((failure) => failure.timedOut)
+      ? "Local Docker engine queries timed out. Neither local named pipe returned an inventory; remote contexts are not inspected."
+      : "Docker Desktop is installed, but its local engine is not running or cannot be accessed through docker_engine or dockerDesktopLinuxEngine. Start Docker Desktop and retry. Remote contexts are not inspected.",
+  };
+}
 
-  if (result.missing) {
-    return {
-      status: "unavailable",
-      executable: null,
-      mappings: [],
-      reason: options.dockerPath
-        ? `Docker CLI was not found at ${options.dockerPath}.`
-        : "Docker CLI was not found in PATH or Docker Desktop's standard install locations.",
-    };
-  }
-  if (result.timedOut) {
-    return { status: "error", executable, mappings: [], reason: "Docker query timed out." };
-  }
-  if (result.exitCode !== 0) {
-    return {
-      status: "unavailable",
-      executable,
-      mappings: [],
-      reason: dockerDaemonError(result.stderr),
-    };
-  }
-
-  try {
-    return { status: "ok", executable, mappings: parseDockerPorts(result.stdout, port) };
-  } catch {
-    return { status: "error", executable, mappings: [], reason: "Docker returned unreadable container data." };
-  }
+function unsupportedPublishedMappings(raw, requestedPort) {
+  if (!raw) return 0;
+  return raw.split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line)).reduce((total, container) => {
+    return total + String(container.Ports ?? "").split(/,\s*/).map((value) => value.trim()).filter((value) => {
+      if (!value.includes("->") || !value.endsWith("/tcp") || parsePublishedPort(value)) return false;
+      const range = value.match(/:(\d+)-(\d+)->/);
+      if (requestedPort != null && range && (requestedPort < Number(range[1]) || requestedPort > Number(range[2]))) return false;
+      return true;
+    }).length;
+  }, 0);
 }
 
 export function findDockerDesktopCli(options = {}) {
@@ -109,22 +163,4 @@ function parsePublishedPort(value) {
     containerPort: Number(match[3]),
     protocol: match[4],
   };
-}
-
-function conciseError(value, fallback) {
-  if (!value) return fallback;
-  const lines = value
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-  const relevant = lines.filter((line) => !/^warning:/i.test(line));
-  return (relevant.at(-1) ?? lines.at(-1) ?? fallback).slice(0, 500);
-}
-
-function dockerDaemonError(value) {
-  const detail = conciseError(value, "Docker is not running or is not reachable.");
-  if (/failed to connect|cannot connect|docker_engine|daemon is not running/i.test(detail)) {
-    return "Docker Desktop is installed, but its engine is not running or cannot be accessed. Start Docker Desktop and retry.";
-  }
-  return `Docker CLI found, but the engine is unavailable: ${detail}`;
 }

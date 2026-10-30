@@ -39,6 +39,14 @@ export function parseWslOutput(raw) {
 }
 
 export async function collectWsl(port, options = {}) {
+  return queryWsl(port, options);
+}
+
+export async function inventoryWsl(options = {}) {
+  return queryWsl(undefined, options);
+}
+
+async function queryWsl(port, options) {
   if (process.platform !== "win32" && !options.force) {
     return {
       status: "unavailable",
@@ -48,10 +56,11 @@ export async function collectWsl(port, options = {}) {
     };
   }
 
+  const filter = port == null ? "" : ` 'sport = :${port}'`;
   const script = [
     `printf '${DISTRO_MARKER}%s\\n' "\${WSL_DISTRO_NAME:-unknown}"`,
     "if ! command -v ss >/dev/null 2>&1; then echo 'iproute2/ss is not installed' >&2; exit 127; fi",
-    `ss -H -ltnp 'sport = :${port}' 2>/dev/null || ss -H -ltn 'sport = :${port}'`,
+    `ss -H -ltnp${filter} 2>/dev/null || ss -H -ltn${filter}`,
   ].join("; ");
   const args = [];
   if (options.distro) args.push("--distribution", options.distro);

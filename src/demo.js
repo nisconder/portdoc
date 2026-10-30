@@ -1,4 +1,5 @@
 import { analyze } from "./analyze.js";
+import { buildNextActions } from "./advice.js";
 
 // Reproducible example, never presented as evidence from the user's computer.
 export function createDemoReport() {
@@ -18,7 +19,8 @@ export function createDemoReport() {
     ipv6: connect("::1", false),
   };
   const report = {
-    schemaVersion: 2,
+    schemaVersion: 3,
+    kind: "diagnosis",
     sample: true,
     checkedAt: "2026-10-28T00:00:00.000Z",
     port: 5173,
@@ -39,7 +41,9 @@ export function createDemoReport() {
     },
     probes: { windows: windows.ipv4, wsl: wsl.ipv4 },
     endpointMatrix: { windows, wsl },
+    reservations: { status: "ok", ranges: [], matches: [], families: { ipv4: { status: "ok" }, ipv6: { status: "ok" } } },
   };
   report.assessment = analyze(report);
+  report.nextActions = buildNextActions(report);
   return report;
 }

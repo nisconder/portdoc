@@ -1,6 +1,8 @@
 import { diagnose } from "./diagnose.js";
 import { createDemoReport } from "./demo.js";
-import { formatText } from "./format.js";
+import { formatText, formatScan, formatDoctor } from "./format.js";
+import { scan } from "./scan.js";
+import { doctor } from "./doctor.js";
 import { getHelpText } from "./help.js";
 import { createMessages, normalizeLanguage, resolveLanguage } from "./i18n.js";
 import { VERSION } from "./version.js";
@@ -22,7 +24,7 @@ export async function main(argv, dependencies = {}) {
   }
 
   if (options.help) {
-    (dependencies.stdout ?? console.log)(getHelpText(language));
+    (dependencies.stdout ?? console.log)(getHelpText(language, options.helpTopic));
     return 0;
   }
   if (options.version) {
@@ -30,15 +32,25 @@ export async function main(argv, dependencies = {}) {
     return 0;
   }
 
-  const report = options.demo ? createDemoReport() : await (dependencies.diagnose ?? diagnose)(options.port, options);
+  const report = options.command === "scan"
+    ? await (dependencies.scan ?? scan)(options)
+    : options.command === "doctor"
+      ? await (dependencies.doctor ?? doctor)(options)
+      : options.demo ? createDemoReport() : await (dependencies.diagnose ?? diagnose)(options.port, options);
+  const formatter = options.command === "scan" ? formatScan : options.command === "doctor" ? formatDoctor : formatText;
   const output = options.json
     ? JSON.stringify(report, null, 2)
-    : formatText(report, {
+    : formatter(report, {
         color: options.color ?? Boolean(process.stdout.isTTY && !process.env.NO_COLOR),
         width: process.stdout.columns,
         language,
       });
   (dependencies.stdout ?? console.log)(output);
+  if (options.command === "doctor") return report.ready ? 0 : 2;
+  if (options.command === "scan") {
+    if (report.overlapCount > 0) return 1;
+    return Object.values(report.sources).every((source) => source.status === "ok") ? 0 : 2;
+  }
   return options.demo ? 0 : exitCodeFor(report.assessment.verdict);
 }
 
@@ -56,6 +68,9 @@ export function parseArgs(argv) {
     else if (value === "--color") options.color = true;
     else if (value === "--no-color") options.color = false;
     else if (value === "--no-probe") options.probe = false;
+    else if (value === "--issues-only") options.issuesOnly = true;
+    else if (value === "--limit") options.limit = parseLimit(requireValue(argv, ++index, value));
+    else if (value.startsWith("--limit=")) options.limit = parseLimit(value.slice("--limit=".length));
     else if (value === "--lang" || value === "-l") options.lang = parseLanguage(requireValue(argv, ++index, value));
     else if (value.startsWith("--lang=")) options.lang = parseLanguage(value.slice("--lang=".length));
     else if (value === "--distro" || value === "-d") options.distro = requireValue(argv, ++index, value);
@@ -65,7 +80,18 @@ export function parseArgs(argv) {
     else positional.push(value);
   }
 
-  if (options.help || options.version) return options;
+  if (options.help) {
+    const topic = positional.find((value) => ["scan", "doctor", "demo"].includes(value));
+    return topic ? { ...options, helpTopic: topic } : options;
+  }
+  if (options.version) return options;
+  if (options.limit !== undefined || options.issuesOnly !== undefined) {
+    if (positional.length !== 1 || positional[0] !== "scan") throw new Error("--limit and --issues-only require the scan command.");
+  }
+  if (positional.length === 1 && ["scan", "doctor"].includes(positional[0])) {
+    if (positional[0] === "doctor" && (options.distro || options.probe === false)) throw new Error("doctor checks the Windows host, not a selected distribution or port.");
+    return { ...options, command: positional[0] };
+  }
   if (positional.length === 1 && positional[0] === "demo") return { ...options, demo: true };
   if (positional.length !== 1) throw new Error("Provide exactly one TCP port number.");
   const port = Number(positional[0]);
@@ -90,6 +116,11 @@ function parseTimeout(value) {
   return number;
 }
 
+function parseLimit(value) {
+  if (!/^\d+$/.test(value) || Number(value) < 1 || Number(value) > 500) throw new Error("--limit must be an integer from 1 to 500.");
+  return Number(value);
+}
+
 function parseLanguage(value) {
   const language = normalizeLanguage(value);
   if (!language) throw new Error("--lang must be auto, en, or zh-CN.");
@@ -107,6 +138,9 @@ function localizeArgumentError(message, messages) {
   if (message === "Provide exactly one TCP port number.") return messages.t("errorPortRequired");
   if (message === "--timeout must be an integer from 250 to 30000 milliseconds.") return messages.t("errorTimeout");
   if (message === "--lang must be auto, en, or zh-CN.") return messages.t("errorLanguage");
+  if (message === "--limit must be an integer from 1 to 500.") return messages.t("errorLimit");
+  if (message === "--limit and --issues-only require the scan command.") return messages.t("errorScanOptions");
+  if (message === "doctor checks the Windows host, not a selected distribution or port.") return messages.t("errorDoctorOptions");
   const unknown = message.match(/^Unknown option: (.+)$/);
   if (unknown) return messages.t("errorUnknownOption", { value: unknown[1] });
   const invalidPort = message.match(/^Invalid TCP port: (.+)$/);

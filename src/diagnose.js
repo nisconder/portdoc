@@ -3,6 +3,8 @@ import { collectDocker } from "./collectors/docker.js";
 import { collectWindows } from "./collectors/windows.js";
 import { collectWsl } from "./collectors/wsl.js";
 import { probeWindowsMatrix, probeWslMatrix } from "./probes.js";
+import { collectReservations } from "./collectors/reservations.js";
+import { buildNextActions } from "./advice.js";
 
 export async function diagnose(port, options = {}) {
   const timeoutMs = options.timeoutMs ?? 4_000;
@@ -10,10 +12,11 @@ export async function diagnose(port, options = {}) {
   const collectorOptions = { timeoutMs, distro: options.distro, dockerPath: options.dockerPath };
   const collectors = options.collectors ?? {};
 
-  const [windows, wsl, docker] = await Promise.all([
+  const [windows, wsl, docker, reservations] = await Promise.all([
     (collectors.windows ?? collectWindows)(port, collectorOptions),
     (collectors.wsl ?? collectWsl)(port, collectorOptions),
     (collectors.docker ?? collectDocker)(port, collectorOptions),
+    (collectors.reservations ?? collectReservations)(port, collectorOptions),
   ]);
 
   let endpointMatrix;
@@ -31,7 +34,8 @@ export async function diagnose(port, options = {}) {
   }
 
   const report = {
-    schemaVersion: 2,
+    schemaVersion: 3,
+    kind: "diagnosis",
     checkedAt: new Date().toISOString(),
     port,
     protocol: "tcp",
@@ -39,7 +43,9 @@ export async function diagnose(port, options = {}) {
     sources: { windows, wsl, docker },
     probes: { windows: endpointMatrix.windows.ipv4, wsl: endpointMatrix.wsl.ipv4 },
     endpointMatrix,
+    reservations,
   };
   report.assessment = analyze(report);
+  report.nextActions = buildNextActions(report);
   return report;
 }

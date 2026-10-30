@@ -1,0 +1,485 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "scan.schema.json",
+  "title": "portdoc inventory report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "checkedAt",
+    "sources",
+    "ports",
+    "totalPorts",
+    "overlapCount",
+    "truncated",
+    "limit"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "scan"
+    },
+    "checkedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "windows",
+        "wsl",
+        "docker"
+      ],
+      "properties": {
+        "windows": {
+          "$ref": "#/$defs/windowsSource"
+        },
+        "wsl": {
+          "$ref": "#/$defs/wslSource"
+        },
+        "docker": {
+          "$ref": "#/$defs/dockerSource"
+        }
+      }
+    },
+    "ports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "port",
+          "windows",
+          "wsl",
+          "docker",
+          "overlap"
+        ],
+        "properties": {
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "windows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/listener"
+            }
+          },
+          "wsl": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/listener"
+            }
+          },
+          "docker": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "containerId",
+                "container",
+                "image",
+                "hostAddress",
+                "hostPort",
+                "containerPort",
+                "protocol"
+              ],
+              "properties": {
+                "containerId": {
+                  "type": "string"
+                },
+                "container": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string"
+                },
+                "hostAddress": {
+                  "type": "string"
+                },
+                "hostPort": {
+                  "type": "integer"
+                },
+                "containerPort": {
+                  "type": "integer"
+                },
+                "protocol": {
+                  "const": "tcp"
+                },
+                "composeProject": {
+                  "$ref": "#/$defs/nullableString"
+                },
+                "composeService": {
+                  "$ref": "#/$defs/nullableString"
+                },
+                "projectPath": {
+                  "$ref": "#/$defs/nullableString"
+                }
+              }
+            }
+          },
+          "overlap": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "totalPorts": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "overlapCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 500
+    }
+  },
+  "$defs": {
+    "sourceStatus": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "unavailable",
+        "error"
+      ]
+    },
+    "nullableString": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "nullableInteger": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "listener": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address",
+        "port",
+        "pid",
+        "process"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer"
+        },
+        "state": {
+          "type": "string"
+        },
+        "pid": {
+          "$ref": "#/$defs/nullableInteger"
+        },
+        "process": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "path": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "commandLine": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "cwd": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "projectPath": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "identitySource": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "windowsSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "listeners"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/sourceStatus"
+        },
+        "listeners": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/listener"
+          }
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "wslSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "listeners"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/sourceStatus"
+        },
+        "distro": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "listeners": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/listener"
+          }
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "dockerSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "mappings"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/sourceStatus"
+        },
+        "executable": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "containerId",
+              "container",
+              "image",
+              "hostAddress",
+              "hostPort",
+              "containerPort",
+              "protocol"
+            ],
+            "properties": {
+              "containerId": {
+                "type": "string"
+              },
+              "container": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "hostAddress": {
+                "type": "string"
+              },
+              "hostPort": {
+                "type": "integer"
+              },
+              "containerPort": {
+                "type": "integer"
+              },
+              "protocol": {
+                "const": "tcp"
+              },
+              "composeProject": {
+                "$ref": "#/$defs/nullableString"
+              },
+              "composeService": {
+                "$ref": "#/$defs/nullableString"
+              },
+              "projectPath": {
+                "$ref": "#/$defs/nullableString"
+              }
+            }
+          }
+        },
+        "reason": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reachable"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "ok",
+            "unavailable",
+            "error",
+            "skipped"
+          ]
+        },
+        "reachable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "latencyMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reason": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "family": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "enum": [
+            4,
+            6,
+            null
+          ]
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "severity",
+        "code",
+        "message"
+      ],
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "code": {
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "windows",
+            "wsl"
+          ]
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verdict",
+        "summary",
+        "confidence",
+        "findings"
+      ],
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "FREE",
+            "OK",
+            "CONFLICT",
+            "UNKNOWN"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        }
+      }
+    },
+    "endpointMatrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "windows",
+        "wsl"
+      ],
+      "properties": {
+        "windows": {
+          "$ref": "#/$defs/endpointSide"
+        },
+        "wsl": {
+          "$ref": "#/$defs/endpointSide"
+        }
+      }
+    },
+    "endpointSide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "localhost",
+        "ipv4",
+        "ipv6"
+      ],
+      "properties": {
+        "localhost": {
+          "$ref": "#/$defs/probe"
+        },
+        "ipv4": {
+          "$ref": "#/$defs/probe"
+        },
+        "ipv6": {
+          "$ref": "#/$defs/probe"
+        }
+      }
+    }
+  }
+}

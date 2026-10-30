@@ -10,6 +10,18 @@ export function analyze(report) {
     : Object.values(report.probes);
   const incompleteProbes = allProbes.some((probe) => ["error", "unavailable"].includes(probe.status));
   const skippedProbes = allProbes.length > 0 && allProbes.every((probe) => probe.status === "skipped");
+  const reservationMatches = report.reservations?.matches ?? [];
+  const reservationsIncomplete = report.reservations && report.reservations.status !== "ok";
+  if (reservationMatches.length) findings.push({
+    severity: "medium",
+    code: "WINDOWS_RESERVED_PORT",
+    message: "This port is in a Windows excluded TCP range. New bindings may be restricted depending on the API and permissions; this does not identify an occupying process.",
+  });
+  if (reservationsIncomplete) findings.push({
+    severity: "low",
+    code: "RESERVATIONS_INCOMPLETE",
+    message: "Windows excluded TCP ranges could not be fully checked. Successful listener checks do not prove a new bind will succeed.",
+  });
 
   const independentWindows = windows.filter((listener) => !isForwarderProcess(listener));
   const nativeWsl = wsl.filter((listener) => !isDockerProcess(listener));
@@ -66,7 +78,13 @@ export function analyze(report) {
   }
 
   if (claimCount === 0) {
-    if (!complete || reachableWithoutOwner || incompleteProbes) {
+    if (reservationMatches.length) return {
+      verdict: "UNKNOWN",
+      summary: "No listener was found, but this port appears in a Windows excluded TCP range. Review the reservation before attempting a new bind.",
+      confidence: "medium",
+      findings,
+    };
+    if (!complete || reachableWithoutOwner || incompleteProbes || reservationsIncomplete) {
       const unavailable = Object.entries(report.sources)
         .filter(([, source]) => source.status !== "ok")
         .map(([name]) => name);
@@ -132,7 +150,7 @@ export function analyze(report) {
   return {
     verdict: "OK",
     summary: describeSingleOwner(windows, wsl, docker),
-    confidence: complete && !incompleteProbes ? "high" : "medium",
+    confidence: complete && !incompleteProbes && !reservationsIncomplete && !reservationMatches.length ? "high" : "medium",
     findings,
   };
 }

@@ -13,6 +13,7 @@ export function formatText(report, options = {}) {
     "",
     paint.section(messages.t("ownership")),
     ...formatOwnership(report, paint, width, messages),
+    ...(report.reservations ? ["", paint.section(messages.t("reservations")), ...formatReservations(report.reservations, paint, width, messages)] : []),
     ...(!report.endpointMatrix ? ["", paint.section(`${messages.t("reachability")}  ${report.target}:${report.port}`), ...formatReachability(report, paint, width, messages)] : []),
   ];
 
@@ -25,6 +26,15 @@ export function formatText(report, options = {}) {
     lines.push("", paint.section(messages.t("next")), ...formatNextSteps(nextSteps, paint, width));
   }
 
+  if (report.nextActions?.length) {
+    lines.push("", paint.section(messages.t("verify")));
+    for (const action of report.nextActions.slice(0, 6)) {
+      lines.push(...wrapText(messages.t(`action${action.code}`), width - 2).map((line) => `  ${paint.muted(line)}`));
+      lines.push(`    ${action.command}`);
+    }
+    if (report.nextActions.length > 6) lines.push(...wrapText(messages.t("actionsTruncated"), width - 2).map((line) => `  ${paint.muted(line)}`));
+  }
+
   lines.push(
     "",
     ...wrapText(
@@ -33,6 +43,98 @@ export function formatText(report, options = {}) {
     ).map(paint.muted),
   );
   return lines.join("\n");
+}
+
+export function formatScan(report, options = {}) {
+  const width = normalizeWidth(options.width);
+  const paint = createPainter(options.color ?? false);
+  const messages = createMessages(options.language ?? "en");
+  const lines = [paint.brand(`PORTDOC  ${messages.t("scanTitle")}`), ""];
+  lines.push(...wrapText(messages.t("scanNote"), width));
+  lines.push("", ...formatSourceStatuses(report.sources, paint, width, messages), "");
+  if (!report.ports.length) lines.push(messages.t("scanEmpty"));
+  const cellWidth = Math.floor((width - 10) / 3);
+  if (width >= 72 && report.ports.length) lines.push(`  ${padDisplay("TCP", 8)}${padDisplay("Windows", cellWidth)}${padDisplay("WSL", cellWidth)}Docker`);
+  for (const entry of report.ports) {
+    const owners = {
+      windows: shortOwners(entry.windows, messages),
+      wsl: shortOwners(entry.wsl, messages),
+      docker: shortContainers(entry.docker, messages),
+    };
+    if (width >= 72) {
+      lines.push(`  ${paint.bold(padDisplay(String(entry.port), 8))}${padDisplay(clipDisplay(owners.windows, cellWidth - 1), cellWidth)}${padDisplay(clipDisplay(owners.wsl, cellWidth - 1), cellWidth)}${clipDisplay(owners.docker, cellWidth - 1)}`);
+    } else {
+      lines.push(`  ${paint.bold(`${entry.port}/tcp`)}`);
+      for (const source of ["windows", "wsl", "docker"]) if (entry[source].length) lines.push(...wrapText(`${messages.t(source)}: ${owners[source]}`, width - 4).map((line) => `    ${line}`));
+    }
+    if (entry.overlap) lines.push(`    ${paint.warn(messages.t("scanOverlap"))} · portdoc ${entry.port}`);
+    const projects = [...new Set([...entry.windows, ...entry.wsl, ...entry.docker].map((item) => item.projectPath).filter(Boolean))];
+    for (const project of projects.slice(0, 2)) lines.push(...wrapText(project, width - 4).map((line) => `    ${paint.muted(line)}`));
+  }
+  lines.push("", ...wrapText(messages.t("scanCount", { shown: report.ports.length, total: report.totalPorts }), width));
+  lines.push(...wrapText(messages.t("scanOverlapCount", { count: report.overlapCount }), width));
+  if (report.truncated) lines.push(...wrapText(messages.t("scanTruncated"), width).map(paint.warn));
+  if (Object.values(report.sources).some((source) => source.status !== "ok")) lines.push(...wrapText(messages.t("scanIncomplete"), width).map(paint.warn));
+  lines.push(...wrapText(messages.t("scanReviewNote"), width).map(paint.muted));
+  const first = report.ports.find((entry) => entry.overlap) ?? report.ports[0];
+  lines.push("", first ? messages.t("scanNext", { port: first.port }) : "portdoc doctor");
+  return lines.join("\n");
+}
+
+export function formatDoctor(report, options = {}) {
+  const width = normalizeWidth(options.width);
+  const paint = createPainter(options.color ?? false);
+  const messages = createMessages(options.language ?? "en");
+  const lines = [paint.brand(`PORTDOC  ${messages.t("doctorTitle")}`), "", ...wrapText(messages.t(report.ready ? "doctorReady" : "doctorNotReady"), width), ""];
+  for (const check of report.checks) {
+    const key = check.code === "OK" ? `doctorOK${check.id}` : `doctor${check.code}`;
+    const detail = messages.t(key, { count: check.detail.match(/^\d+/)?.[0] ?? "?" });
+    lines.push(...formatRow({ symbol: check.status === "ok" ? "✓" : check.status === "error" ? "×" : "!", label: messages.t(check.id), primary: statusLabel(check.status, messages), detail: detail === key ? check.detail : detail, tone: check.status === "ok" ? "good" : check.status === "error" ? "bad" : "warn" }, paint, width));
+    const errorCode = check.detail.match(/(?:Wsl\/[A-Za-z0-9_/-]+|E_ACCESSDENIED|WSL_E_[A-Z_]+)/)?.[0];
+    if (errorCode) lines.push(`      ${paint.muted(errorCode)}`);
+    if (check.command) lines.push(`    ${check.command}`);
+  }
+  lines.push("", messages.t("doctorNext"));
+  return lines.join("\n");
+}
+
+function formatSourceStatuses(sources, paint, width, messages) {
+  return Object.entries(sources).flatMap(([name, source]) => formatRow({ symbol: source.status === "ok" ? "✓" : "!", label: messages.t(name), primary: statusLabel(source.status, messages), detail: source.status !== "ok" ? localizeReason(source.reason, messages) : null, tone: source.status === "ok" ? "good" : "warn" }, paint, width));
+}
+
+function shortOwners(items, messages) {
+  if (!items.length) return messages.t("scanMissing");
+  const first = items[0];
+  const ids = new Set(items.map((item) => `${item.pid}:${item.process}`));
+  return `${first.process || (first.pid ? `PID ${first.pid}` : "?")}${first.process && first.pid ? ` #${first.pid}` : ""}${ids.size > 1 ? ` +${ids.size - 1}` : ""}`;
+}
+
+function shortContainers(items, messages) {
+  if (!items.length) return messages.t("scanMissing");
+  const ids = new Set(items.map((item) => item.containerId || item.container));
+  return `${items[0].composeService || items[0].container}${ids.size > 1 ? ` +${ids.size - 1}` : ""}`;
+}
+
+function clipDisplay(value, width) {
+  if (displayWidth(value) <= width) return value;
+  let prefix = "";
+  for (const character of value) {
+    if (displayWidth(prefix + character) > width - 1) break;
+    prefix += character;
+  }
+  return `${prefix}…`;
+}
+
+function formatReservations(reservations, paint, width, messages) {
+  const lines = [];
+  for (const range of reservations.matches) lines.push(`  ${paint.warn(`IPv${range.family}  ${range.start}–${range.end}${range.administered ? " *" : ""}`)}`);
+  if (reservations.status !== "ok") lines.push(...wrapText(messages.t("reservationsPartial"), width - 2).map((line) => `  ${paint.warn(line)}`));
+  if (!reservations.matches.length && reservations.status === "ok") lines.push(`  ${paint.muted(messages.t("reservationsNone"))}`);
+  for (const [family, result] of Object.entries(reservations.families)) {
+    if (result.status !== "ok" && result.reason) lines.push(...wrapText(`${family}: ${result.reason}`, width - 2).map((line) => `  ${paint.muted(line)}`));
+  }
+  if (reservations.matches.length) lines.push(...wrapText(messages.t("reservationsNote"), width - 2).map((line) => `  ${paint.muted(line)}`));
+  return lines;
 }
 
 function formatSummary(report, paint, width, messages) {
@@ -230,15 +332,16 @@ function formatNextSteps(steps, paint, width) {
 }
 
 function formatRow(row, paint, width) {
-  const labelWidth = 14;
+  const labelWidth = width < 52 ? 10 : 14;
   const paddedLabel = padDisplay(row.label, labelWidth);
-  const prefix = `  ${row.symbol} ${paddedLabel} `;
+  const suffix = row.label ? ` ${paddedLabel} ` : " ";
+  const prefix = `  ${row.symbol}${suffix}`;
   const prefixWidth = displayWidth(prefix);
   const continuation = " ".repeat(prefixWidth);
   const available = Math.max(20, width - prefixWidth);
   const tone = paint[row.tone] ?? paint.text;
   const primaryLines = wrapText(row.primary, available);
-  const lines = primaryLines.map((line, index) => `${index === 0 ? paint.symbol(row.symbol, row.tone) + ` ${paddedLabel} ` : continuation}${tone(line)}`);
+  const lines = primaryLines.map((line, index) => `${index === 0 ? paint.symbol(row.symbol, row.tone) + suffix : continuation}${tone(line)}`);
 
   if (row.detail) {
     for (const detailLine of wrapText(row.detail, available)) {
@@ -321,6 +424,7 @@ function localizedSummary(report, messages) {
   if (verdict === "FREE") return messages.t(report.probes.windows.status === "skipped" ? "summaryFreeSkipped" : "summaryFREE");
   if (verdict === "CONFLICT") return messages.t("summaryCONFLICT");
   if (verdict === "UNKNOWN") {
+    if (report.assessment.findings.some((finding) => finding.code === "WINDOWS_RESERVED_PORT") && !report.sources.windows.listeners.length && !report.sources.wsl.listeners.length && !report.sources.docker.mappings.length) return messages.t("summaryReserved");
     if (report.assessment.findings.some((finding) => ["LOCALHOST_RESOLUTION_MISMATCH", "ENDPOINT_FAMILY_MISMATCH"].includes(finding.code))) return messages.t("summaryEndpointMismatch");
     if (report.assessment.findings.some((finding) => finding.code === "WSL_NOT_REACHABLE_FROM_WINDOWS")) {
       return messages.t("summaryWslForwarding");

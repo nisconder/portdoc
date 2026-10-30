@@ -23,6 +23,36 @@ test("reports a fully inspected unused port as FREE", () => {
   assert.equal(analyze(report()).verdict, "FREE");
 });
 
+test("does not call an excluded Windows port free when no listener exists", () => {
+  const evidence = report();
+  evidence.reservations = { status: "ok", matches: [{ family: 4, start: 50000, end: 50059, administered: true }] };
+  const result = analyze(evidence);
+  assert.equal(result.verdict, "UNKNOWN");
+  assert.equal(result.confidence, "medium");
+  assert.ok(result.findings.some((finding) => finding.code === "WINDOWS_RESERVED_PORT"));
+  assert.doesNotMatch(result.summary, /guaranteed|cannot bind/i);
+});
+
+test("an existing listener inside an exclusion is not automatically a conflict", () => {
+  const evidence = report({ sources: { windows: { status: "ok", listeners: [{ process: "node", pid: 1 }] } } });
+  evidence.reservations = { status: "ok", matches: [{ family: 6, start: 50000, end: 50059 }] };
+  const result = analyze(evidence);
+  assert.equal(result.verdict, "OK");
+  assert.equal(result.confidence, "medium");
+  assert.ok(result.findings.some((finding) => finding.code === "WINDOWS_RESERVED_PORT"));
+});
+
+test("incomplete exclusion evidence prevents a FREE result without erasing listener evidence", () => {
+  const evidence = report();
+  evidence.reservations = { status: "error", matches: [] };
+  assert.equal(analyze(evidence).verdict, "UNKNOWN");
+  evidence.sources.windows.listeners = [{ process: "node", pid: 1 }];
+  const result = analyze(evidence);
+  assert.equal(result.verdict, "OK");
+  assert.equal(result.confidence, "medium");
+  assert.ok(result.findings.some((finding) => finding.code === "RESERVATIONS_INCOMPLETE"));
+});
+
 test("reports simultaneous Windows and WSL listeners as CONFLICT", () => {
   const result = analyze(report({
     sources: {

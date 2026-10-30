@@ -30,10 +30,18 @@ export function parseNetstatListeners(raw, requestedPort) {
       process: null,
       path: null,
     }))
-    .filter((listener) => listener.port === requestedPort);
+    .filter((listener) => requestedPort == null || listener.port === requestedPort);
 }
 
 export async function collectWindows(port, options = {}) {
+  return queryWindows(port, options);
+}
+
+export async function inventoryWindows(options = {}) {
+  return queryWindows(undefined, options);
+}
+
+async function queryWindows(port, options) {
   if (process.platform !== "win32" && !options.force) {
     return {
       status: "unavailable",
@@ -68,6 +76,11 @@ export async function collectWindows(port, options = {}) {
   const script = [
     "[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)",
     `$processIds = @(${processIds.join(",")})`,
+    "$metadataById = @{}",
+    "try {",
+    "  $filter = ($processIds | ForEach-Object { 'ProcessId = ' + $_ }) -join ' OR '",
+    "  foreach ($item in (Get-CimInstance Win32_Process -Filter $filter -ErrorAction Stop)) { $metadataById[[int]$item.ProcessId] = $item }",
+    "} catch {}",
     "$items = @($processIds | ForEach-Object {",
     "  try {",
     "    $process = Get-Process -Id $_ -ErrorAction Stop",
@@ -75,7 +88,7 @@ export async function collectWindows(port, options = {}) {
     "    try { $processPath = $process.Path } catch {}",
     "    $commandLine = $null",
     "    try {",
-    "      $cim = Get-CimInstance Win32_Process -Filter ('ProcessId = ' + $_) -ErrorAction Stop",
+    "      $cim = $metadataById[[int]$_]",
     "      $commandLine = $cim.CommandLine",
     "      if ($cim.ExecutablePath) { $processPath = $cim.ExecutablePath }",
     "    } catch {}",
