@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { setTimeout as delay } from "node:timers/promises";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const builtExecutable = path.resolve(process.argv[2] ?? path.join(root, "dist", "portdoc-win-x64.exe"));
@@ -98,7 +99,30 @@ assert.ok(report.reservations);
 assert.ok(Array.isArray(report.nextActions));
 assert.equal(report.probes.windows.status, "skipped");
 } finally {
-await unlink(executable);
-await rmdir(isolated);
+  const deadline = Date.now() + 3_000;
+  await cleanupTemporary(() => unlink(executable), executable, deadline);
+  await cleanupTemporary(() => rmdir(isolated), isolated, deadline);
 }
 console.log(`EXE smoke checks passed: version ${version}, bare/help, en/zh-CN, diagnosis/demo v3, scan, doctor, errors, JSON; isolated cwd and no Node/npm on PATH.`);
+
+async function cleanupTemporary(remove, target, deadline) {
+  let pauseMs = 100;
+  while (true) {
+    try {
+      await remove();
+      return;
+    } catch (error) {
+      if (error.code === "ENOENT") return;
+      const remaining = deadline - Date.now();
+      if (["EBUSY", "EPERM", "ENOTEMPTY"].includes(error.code) && remaining > 0) {
+        await delay(Math.min(pauseMs, remaining));
+        pauseMs = 200;
+        continue;
+      }
+      // Windows can retain an EXE/directory handle after the last child exits.
+      // Cleanup is best-effort; never replace the actual smoke assertion error.
+      console.warn(`Smoke cleanup warning: ${error.code ?? "unknown error"} at ${target}`);
+      return;
+    }
+  }
+}
