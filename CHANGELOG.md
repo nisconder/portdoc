@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Bound collector timeout cleanup to an additional 250 ms, closing pipes and unreferencing process handles at the deadline.
+- Attempt Windows process-tree termination and POSIX process-group termination before falling back to direct-child cleanup.
+- Add real subprocess timeout regression coverage and a real-environment validation checklist.
+
 ## 0.7.0
 
 - Add `portdoc scan` to inventory observed TCP listeners and mappings once per layer.

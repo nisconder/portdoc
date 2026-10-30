@@ -185,7 +185,13 @@ may select a different address or retry another family.
 TCP success proves reachability, not which application accepted the connection.
 Cross-layer listeners can be expected forwarding or independent namespaces.
 portdoc does not claim to identify the final receiver, send HTTP payloads,
-kill processes, change networking, or upload reports.
+terminate observed listeners, change networking, or upload reports.
+Timed-out collector commands started by portdoc are terminated on a best-effort
+basis: Windows uses `taskkill /T /F`, and POSIX uses a private process group.
+Cleanup has a separate 250 ms deadline, after which portdoc closes its pipes,
+stops waiting on child handles and marks the command as timed out.
+Scheduling can add latency.
+Escaped descendants and processes inside WSL are not guaranteed to be terminated.
 
 Common credential-like arguments are redacted before display and JSON output.
 Command lines and local paths can still contain private information; review
@@ -211,7 +217,11 @@ node scripts/build-exe.mjs
 
 The EXE build downloads an official, pinned Node runtime and verifies its
 SHA-256 before embedding the original modules using Node SEA. See
-[build instructions](docs/build.md). Windows CI tests Node 20, 22 and 24.
+[build instructions](docs/build.md). CI is configured for Node 20, 22 and 24
+on Windows and Linux.
+Linux tests cover command timeout behavior; they do not establish Windows/WSL/Docker
+diagnostic correctness. See [reproducible validation cases](docs/validation.md)
+for the real-environment evidence checklist and unverified scenarios.
 
 In a checkout, `portdoc.cmd` forwards command-line arguments and shows help
 when called alone. Double-click `portdoc-launcher.cmd` for a port prompt.
