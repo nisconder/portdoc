@@ -24,6 +24,8 @@ if (process.platform !== "win32" || process.arch !== "x64") {
   throw new Error("The release EXE must be built on Windows x64.");
 }
 
+const sourceCommit = readSourceCommit();
+
 await Promise.all([mkdir(cache, { recursive: true }), mkdir(work, { recursive: true }), mkdir(archiveStage, { recursive: true }), mkdir(dist, { recursive: true })]);
 
 const releaseUrl = `https://nodejs.org/dist/v${runtimeVersion}`;
@@ -97,6 +99,7 @@ await writeFile(path.join(dist, "SHA256SUMS.txt"), `${sums.join("\n")}\n`);
 await writeFile(path.join(dist, "build-info.json"), `${JSON.stringify({
   package: manifest.name,
   version: manifest.version,
+  sourceCommit,
   runtime: `Node.js ${runtimeVersion}`,
   runtimeUrl: `${releaseUrl}/win-x64/node.exe`,
   runtimeSha256,
@@ -110,6 +113,23 @@ async function downloadText(url) {
   const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });
   if (!response.ok) throw new Error(`Download failed: HTTP ${response.status} (${url})`);
   return response.text();
+}
+
+function readSourceCommit() {
+  const result = spawnSync("git", [
+    "-c", `safe.directory=${root.replaceAll("\\", "/")}`,
+    "rev-parse", "--verify", "HEAD",
+  ], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+    windowsHide: true,
+    timeout: 5_000,
+  });
+  const commit = result.stdout?.trim();
+  return !result.error && result.status === 0 && /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/i.test(commit ?? "")
+    ? commit
+    : null;
 }
 
 function sha256(bytes) {

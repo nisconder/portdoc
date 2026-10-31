@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing release tag, for example v0.6.0
+        description: Existing release tag, for example v0.7.1
         required: true
         type: string
       upload:
@@ -28,9 +28,21 @@ jobs:
       - name: Verify the release tag matches the package version
         env:
           RELEASE_TAG: ${{ inputs.tag }}
-        run: node --input-type=module -e "import fs from 'node:fs'; const pkg=JSON.parse(fs.readFileSync('package.json','utf8')); if(process.env.RELEASE_TAG !== 'v'+pkg.version) throw new Error('Tag and package version differ');"
+        run: node --input-type=module -e "import fs from 'node:fs'; import { VERSION } from './src/version.js'; const pkg=JSON.parse(fs.readFileSync('package.json','utf8')); if(process.env.RELEASE_TAG !== 'v'+pkg.version || VERSION !== pkg.version) throw new Error('Tag, package and CLI versions differ');"
       - run: node --test
       - run: node scripts/build-exe.mjs
+      - name: Verify built release provenance
+        run: |
+          @'
+          import fs from "node:fs";
+          import { execFileSync } from "node:child_process";
+          const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+          const info = JSON.parse(fs.readFileSync("dist/build-info.json", "utf8"));
+          const commit = execFileSync("git", ["rev-parse", "--verify", "HEAD"], { encoding: "utf8" }).trim();
+          if (info.version !== pkg.version || info.sourceCommit !== commit) {
+            throw new Error("Release metadata does not match the tagged checkout");
+          }
+          '@ | node --input-type=module
       - uses: actions/upload-artifact@v4
         with:
           name: portdoc-windows-x64-${{ inputs.tag }}

@@ -1,0 +1,67 @@
+[
+  {
+    "name": "portdoc",
+    "ok": true,
+    "result": {
+      "packageName": "portdoc",
+      "exists": true,
+      "latestVersion": "0.7.0",
+      "security": {
+        "overallLevel": "suspicious",
+        "overallScore": 74,
+        "staticScan": {
+          "packageName": "portdoc",
+          "version": "0.7.0",
+          "overallLevel": "suspicious",
+          "score": 74,
+          "findings": [
+            {
+              "ruleId": "base64-shell",
+              "ruleName": "Base64-encoded shell payload",
+              "severity": "high",
+              "message": "Base64-encoded blob found near shell command keywords, possibly hiding a decoded payload.",
+              "lineNumber": 20,
+              "recommendation": "Decode and inspect any base64 blobs; remove shell execution from package code.",
+              "category": "code-obfuscation"
+            },
+            {
+              "ruleId": "suspicious-build-metadata",
+              "ruleName": "Suspicious build metadata",
+              "severity": "low",
+              "message": "Non-standard metadata field \"_hasShrinkwrap\" present in package.json.",
+              "recommendation": "Inspect the field; remove if injected by a build tool.",
+              "category": "informational"
+            },
+            {
+              "ruleId": "content-process-exec",
+              "ruleName": "Process execution capability",
+              "severity": "medium",
+              "message": "Published runtime source can execute child processes: package/src/lib/run-command.js.",
+              "filePath": "package/src/lib/run-command.js",
+              "lineNumber": 1,
+              "codeSnippet": "import { spawn } from \"node:child_process\";",
+              "recommendation": "Confirm process execution is necessary and arguments cannot be influenced by untrusted input.",
+              "category": "suspicious-dependency"
+            }
+          ],
+          "contentScan": {
+            "status": "complete",
+            "archiveBytes": 51513,
+            "unpackedBytes": 188797,
+            "filesScanned": 28,
+            "filesSkipped": 4,
+            "integrityVerified": true,
+            "truncated": false
+          },
+          "scannedAt": "2026-10-31T08:28:30.622Z"
+        }
+      },
+      "registryInfo": {
+        "description": "Explain localhost TCP reachability and port ownership across Windows, WSL and Docker.",
+        "homepage": "https://github.com/nisconder/portdoc#readme",
+        "repository": "git:git+https://github.com/nisconder/portdoc.git"
+      },
+      "cachedAt": null
+    }
+  }
+]

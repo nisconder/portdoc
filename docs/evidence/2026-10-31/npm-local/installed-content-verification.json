@@ -1,0 +1,202 @@
+{
+  "checkedAt": "2026-10-31T08:29:59.695Z",
+  "version": "0.7.1",
+  "installedPath": "D:\\New!!!\\wsl-port-doctor\\.build\\verification\\npm-installed\\node_modules\\portdoc",
+  "tarball": "portdoc-0.7.1.tgz",
+  "integrity": "sha512-L6Dz+meu0lppt+WhvOFf0iD41mtUsy3nfh25AQQcOvjaN0Wtxuu5i6mGAjEfM0b0Z7MEPt3aUDLxSXC+UM6d7g==",
+  "allFilesMatch": true,
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "sourceSha256": "12be7c69918791f1121d979f328819a8496c2dd0d70eaae3c11d0898d8288c77",
+      "installedSha256": "12be7c69918791f1121d979f328819a8496c2dd0d70eaae3c11d0898d8288c77",
+      "matches": true
+    },
+    {
+      "path": "LICENSE",
+      "sourceSha256": "edc1dee6a3fcd0b8e961db8cd55787b7683167fc21e0ce12d89d14f20915e627",
+      "installedSha256": "edc1dee6a3fcd0b8e961db8cd55787b7683167fc21e0ce12d89d14f20915e627",
+      "matches": true
+    },
+    {
+      "path": "README.md",
+      "sourceSha256": "4ebb83dc14a864b4216e5f5ef0f6c3fb5e0846afa143aa630e8a47d66fa15936",
+      "installedSha256": "4ebb83dc14a864b4216e5f5ef0f6c3fb5e0846afa143aa630e8a47d66fa15936",
+      "matches": true
+    },
+    {
+      "path": "README.zh-CN.md",
+      "sourceSha256": "2dcaced440de0706e2e75c78e8dd35d857ba312f582a67a00f2d32b111f8ab93",
+      "installedSha256": "2dcaced440de0706e2e75c78e8dd35d857ba312f582a67a00f2d32b111f8ab93",
+      "matches": true
+    },
+    {
+      "path": "bin/portdoc.js",
+      "sourceSha256": "80667397b51c7af2b42dcec829162e8ebfc3059e34e7b86c4e595961cd2969fe",
+      "installedSha256": "80667397b51c7af2b42dcec829162e8ebfc3059e34e7b86c4e595961cd2969fe",
+      "matches": true
+    },
+    {
+      "path": "package.json",
+      "sourceSha256": "91d1e8bb54c5d999cc60105fe68a40cc6c1931733dcb7920a85a24ffca5a2d2a",
+      "installedSha256": "91d1e8bb54c5d999cc60105fe68a40cc6c1931733dcb7920a85a24ffca5a2d2a",
+      "matches": true
+    },
+    {
+      "path": "portdoc-launcher.cmd",
+      "sourceSha256": "93a4b91148c3b9a2c9b4c4b0b50d18527e0a218ab0418c4778047356becab1a5",
+      "installedSha256": "93a4b91148c3b9a2c9b4c4b0b50d18527e0a218ab0418c4778047356becab1a5",
+      "matches": true
+    },
+    {
+      "path": "portdoc.cmd",
+      "sourceSha256": "0d910f6eed2699b8669da67e05ba1142a8416f0c954ff6a99928bb68cd3ae33c",
+      "installedSha256": "0d910f6eed2699b8669da67e05ba1142a8416f0c954ff6a99928bb68cd3ae33c",
+      "matches": true
+    },
+    {
+      "path": "portdoc.ps1",
+      "sourceSha256": "4e21b3a8649af9cc1d735d767d2a7b43ff6c26e99ed546b9380023a1b3e331e2",
+      "installedSha256": "4e21b3a8649af9cc1d735d767d2a7b43ff6c26e99ed546b9380023a1b3e331e2",
+      "matches": true
+    },
+    {
+      "path": "schema/doctor.schema.json",
+      "sourceSha256": "5efab5f575e9208e9a1d422b46620c2dc3b2e84cf8b15b0e841922522557b697",
+      "installedSha256": "5efab5f575e9208e9a1d422b46620c2dc3b2e84cf8b15b0e841922522557b697",
+      "matches": true
+    },
+    {
+      "path": "schema/report-v1.schema.json",
+      "sourceSha256": "ce43f0011f3976b871766bec7121e80d62239d31906e04d8f371de022583b36b",
+      "installedSha256": "ce43f0011f3976b871766bec7121e80d62239d31906e04d8f371de022583b36b",
+      "matches": true
+    },
+    {
+      "path": "schema/report-v2.schema.json",
+      "sourceSha256": "2239a4b8cfe8d8fda35101b5f2db7cc7fa6c806c84dc638e881fd84b8620bfe8",
+      "installedSha256": "2239a4b8cfe8d8fda35101b5f2db7cc7fa6c806c84dc638e881fd84b8620bfe8",
+      "matches": true
+    },
+    {
+      "path": "schema/report.schema.json",
+      "sourceSha256": "5def3c8145096952c22eb944d474a761aa74a91ca11e3d3599222dbbd94d0033",
+      "installedSha256": "5def3c8145096952c22eb944d474a761aa74a91ca11e3d3599222dbbd94d0033",
+      "matches": true
+    },
+    {
+      "path": "schema/scan.schema.json",
+      "sourceSha256": "8a86f165054af1bbec47e92e9600383364e88bb2f8b148a42fcd7476aa3bc16a",
+      "installedSha256": "8a86f165054af1bbec47e92e9600383364e88bb2f8b148a42fcd7476aa3bc16a",
+      "matches": true
+    },
+    {
+      "path": "src/advice.js",
+      "sourceSha256": "774f68b4870cda4eab98f6745958a7d386a67fb3465465fff53ac1e24a36aa5c",
+      "installedSha256": "774f68b4870cda4eab98f6745958a7d386a67fb3465465fff53ac1e24a36aa5c",
+      "matches": true
+    },
+    {
+      "path": "src/analyze.js",
+      "sourceSha256": "333eae2a77332e3da0241c340545d622f4188be793ff7d56c753479e08b5c982",
+      "installedSha256": "333eae2a77332e3da0241c340545d622f4188be793ff7d56c753479e08b5c982",
+      "matches": true
+    },
+    {
+      "path": "src/cli.js",
+      "sourceSha256": "821743e956fbdf9f083c5f832c9f9a343ceef660a35296287644f8225353c08e",
+      "installedSha256": "821743e956fbdf9f083c5f832c9f9a343ceef660a35296287644f8225353c08e",
+      "matches": true
+    },
+    {
+      "path": "src/collectors/docker.js",
+      "sourceSha256": "8490513cbd5c539e41463e1705c64eaef7515bab4190e338de24f6fc4fb5df59",
+      "installedSha256": "8490513cbd5c539e41463e1705c64eaef7515bab4190e338de24f6fc4fb5df59",
+      "matches": true
+    },
+    {
+      "path": "src/collectors/reservations.js",
+      "sourceSha256": "99f917fac5cd12d05199dd57c80ec3dad8dbf2f65a24fde9eb40660460915d09",
+      "installedSha256": "99f917fac5cd12d05199dd57c80ec3dad8dbf2f65a24fde9eb40660460915d09",
+      "matches": true
+    },
+    {
+      "path": "src/collectors/windows.js",
+      "sourceSha256": "8f389374dedf1ba32ec3baf2f81eca6529e74fe4af8c18ca05af5e11e29770b3",
+      "installedSha256": "8f389374dedf1ba32ec3baf2f81eca6529e74fe4af8c18ca05af5e11e29770b3",
+      "matches": true
+    },
+    {
+      "path": "src/collectors/wsl.js",
+      "sourceSha256": "f57990c7500e31ac627c36ae0f99853099fc8e3b11aec052b9c6144b4579cafb",
+      "installedSha256": "f57990c7500e31ac627c36ae0f99853099fc8e3b11aec052b9c6144b4579cafb",
+      "matches": true
+    },
+    {
+      "path": "src/demo.js",
+      "sourceSha256": "d47446c0a1654f98f118c1d238276cbeacc250618bd61f688e7f4be2aad4fd5d",
+      "installedSha256": "d47446c0a1654f98f118c1d238276cbeacc250618bd61f688e7f4be2aad4fd5d",
+      "matches": true
+    },
+    {
+      "path": "src/diagnose.js",
+      "sourceSha256": "d481a5fb479a9d14c3092547ef9d191f4bde378a7457e2626f6633f3b6ebf222",
+      "installedSha256": "d481a5fb479a9d14c3092547ef9d191f4bde378a7457e2626f6633f3b6ebf222",
+      "matches": true
+    },
+    {
+      "path": "src/doctor.js",
+      "sourceSha256": "f0f18632d9a42bda15a95411fd8361864cb26e975a0e5d30ad61f8eb3b395b14",
+      "installedSha256": "f0f18632d9a42bda15a95411fd8361864cb26e975a0e5d30ad61f8eb3b395b14",
+      "matches": true
+    },
+    {
+      "path": "src/format.js",
+      "sourceSha256": "2addc175c02ffe791436acd6250f9e8efb0ed845d0176ac5ff7323ca6abc817d",
+      "installedSha256": "2addc175c02ffe791436acd6250f9e8efb0ed845d0176ac5ff7323ca6abc817d",
+      "matches": true
+    },
+    {
+      "path": "src/help.js",
+      "sourceSha256": "b3bcf836a31a71018173c122dfbaa42ad34ed4ab9c7630becd69f2776e2de1e1",
+      "installedSha256": "b3bcf836a31a71018173c122dfbaa42ad34ed4ab9c7630becd69f2776e2de1e1",
+      "matches": true
+    },
+    {
+      "path": "src/i18n.js",
+      "sourceSha256": "8a4b102fdff169aabc383d33e258b99676823473e735e744d319dd02dc5b826f",
+      "installedSha256": "8a4b102fdff169aabc383d33e258b99676823473e735e744d319dd02dc5b826f",
+      "matches": true
+    },
+    {
+      "path": "src/lib/identity.js",
+      "sourceSha256": "5f97bb962d6c05e8db23349802d8e8e3275b29377dc23d7efd07478b822d3407",
+      "installedSha256": "5f97bb962d6c05e8db23349802d8e8e3275b29377dc23d7efd07478b822d3407",
+      "matches": true
+    },
+    {
+      "path": "src/lib/run-command.js",
+      "sourceSha256": "d4efd0d2a8441e994896ff02d9b99519afb4f5c6196b1b6451abccc97e3e3e09",
+      "installedSha256": "d4efd0d2a8441e994896ff02d9b99519afb4f5c6196b1b6451abccc97e3e3e09",
+      "matches": true
+    },
+    {
+      "path": "src/probes.js",
+      "sourceSha256": "046691599b4783b63b3d8f638ab7a29d590a264a7f8f5192f2d80012d5cc1a63",
+      "installedSha256": "046691599b4783b63b3d8f638ab7a29d590a264a7f8f5192f2d80012d5cc1a63",
+      "matches": true
+    },
+    {
+      "path": "src/scan.js",
+      "sourceSha256": "75d9ef75274c412b09ace5825d3539e4cd683c6206513a93bcc9f698ab953b43",
+      "installedSha256": "75d9ef75274c412b09ace5825d3539e4cd683c6206513a93bcc9f698ab953b43",
+      "matches": true
+    },
+    {
+      "path": "src/version.js",
+      "sourceSha256": "f4490d381562961ce6ea67b14da6c8773ca6953d75bdae9849f49887b1d42165",
+      "installedSha256": "f4490d381562961ce6ea67b14da6c8773ca6953d75bdae9849f49887b1d42165",
+      "matches": true
+    }
+  ]
+}

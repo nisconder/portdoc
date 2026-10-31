@@ -1,0 +1,2108 @@
+{
+  "schemaVersion": 1,
+  "kind": "portdoc-live-validation",
+  "startedAt": "2026-10-31T08:32:39.263Z",
+  "environment": {
+    "platform": "win32",
+    "osRelease": "10.0.26300",
+    "node": "v24.22.1",
+    "arch": "x64"
+  },
+  "entry": "D:\\New!!!\\wsl-port-doctor\\.build\\verification\\npm-installed\\node_modules\\portdoc\\bin\\portdoc.js",
+  "distro": "Ubuntu",
+  "cases": [
+    {
+      "id": "ipv4-listener",
+      "pid": 37180,
+      "port": 61421,
+      "independent": {
+        "port": 61421,
+        "dns": {
+          "addresses": [
+            {
+              "address": "::1",
+              "family": 6
+            },
+            {
+              "address": "127.0.0.1",
+              "family": 4
+            }
+          ],
+          "error": null,
+          "elapsedMs": 3
+        },
+        "sockets": [
+          {
+            "address": "::1",
+            "family": 6,
+            "port": 61421,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES",
+            "elapsedMs": 1
+          },
+          {
+            "address": "127.0.0.1",
+            "family": 4,
+            "port": 61421,
+            "status": "connected",
+            "reachable": true,
+            "reason": null,
+            "elapsedMs": 1
+          }
+        ]
+      },
+      "listenerEvidence": {
+        "process": {
+          "file": "powershell.exe",
+          "args": [
+            "-NoProfile",
+            "-NonInteractive",
+            "-EncodedCommand",
+            "WwBDAG8AbgBzAG8AbABlAF0AOgA6AE8AdQB0AHAAdQB0AEUAbgBjAG8AZABpAG4AZwAgAD0AIABbAFQAZQB4AHQALgBVAFQARgA4AEUAbgBjAG8AZABpAG4AZwBdADoAOgBuAGUAdwAoACQAZgBhAGwAcwBlACkACgAkAEUAcgByAG8AcgBBAGMAdABpAG8AbgBQAHIAZQBmAGUAcgBlAG4AYwBlAD0AJwBTAHQAbwBwACcACgAkAHIAbwB3AHMAIAA9ACAAQAAoAEcAZQB0AC0ATgBlAHQAVABDAFAAQwBvAG4AbgBlAGMAdABpAG8AbgAgAC0AUwB0AGEAdABlACAATABpAHMAdABlAG4AIAAtAEUAcgByAG8AcgBBAGMAdABpAG8AbgAgAFMAdABvAHAAIAB8ACAAVwBoAGUAcgBlAC0ATwBiAGoAZQBjAHQAIAB7ACAAJABfAC4ATABvAGMAYQBsAFAAbwByAHQAIAAtAGUAcQAgADYAMQA0ADIAMQAgAH0AKQAKAEMAbwBuAHYAZQByAHQAVABvAC0ASgBzAG8AbgAgAC0ASQBuAHAAdQB0AE8AYgBqAGUAYwB0ACAAQAAoACQAcgBvAHcAcwAgAHwAIABTAGUAbABlAGMAdAAtAE8AYgBqAGUAYwB0ACAATABvAGMAYQBsAEEAZABkAHIAZQBzAHMALABMAG8AYwBhAGwAUABvAHIAdAAsAE8AdwBuAGkAbgBnAFAAcgBvAGMAZQBzAHMAKQAgAC0AQwBvAG0AcAByAGUAcwBzAA=="
+          ],
+          "pid": 28224,
+          "startedAt": "2026-10-31T08:32:39.648Z",
+          "elapsedMs": 2478,
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "stdout": "[{\"LocalAddress\":\"127.0.0.1\",\"LocalPort\":61421,\"OwningProcess\":37180}]\r\n",
+          "stderr": "#< CLIXML\r\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S=\"progress\" RefId=\"1\"><TNRef RefId=\"0\" /><MS><I64 N=\"SourceId\">2</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S=\"progress\" RefId=\"2\"><TNRef RefId=\"0\" /><MS><I64 N=\"SourceId\">3</I64><PR N=\"Record\"><AV>Get-NetTCPConnection -State Listen -ErrorAction Stop | Where-Object { $_.LocalPort -eq 61421 })</AV><AI>581907553</AI><Nil /><PI>-1</PI><PC>100</PC><T>Completed</T><SR>0</SR><SD>已完成 1/1</SD></PR></MS></Obj></Objs>",
+          "stdoutEncoding": "utf8",
+          "stderrEncoding": "utf8",
+          "timedOut": false,
+          "evidence": "ipv4-get-net-tcp.process.json"
+        },
+        "rows": [
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 61421,
+            "OwningProcess": 37180
+          }
+        ]
+      },
+      "cli": {
+        "process": {
+          "file": "C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "args": [
+            "D:\\New!!!\\wsl-port-doctor\\.build\\verification\\npm-installed\\node_modules\\portdoc\\bin\\portdoc.js",
+            "61421",
+            "--json",
+            "--timeout",
+            "4000",
+            "--distro",
+            "Ubuntu"
+          ],
+          "pid": 48044,
+          "startedAt": "2026-10-31T08:32:42.127Z",
+          "elapsedMs": 3704,
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "stdout": "{\n  \"schemaVersion\": 3,\n  \"kind\": \"diagnosis\",\n  \"checkedAt\": \"2026-10-31T08:32:45.823Z\",\n  \"port\": 61421,\n  \"protocol\": \"tcp\",\n  \"target\": \"127.0.0.1\",\n  \"sources\": {\n    \"windows\": {\n      \"status\": \"ok\",\n      \"listeners\": [\n        {\n          \"address\": \"127.0.0.1\",\n          \"port\": 61421,\n          \"pid\": 37180,\n          \"process\": \"node\",\n          \"path\": \"C:\\\\Users\\\\huangshengting\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\node\\\\bin\\\\node.exe\",\n          \"commandLine\": \"\\\"C:\\\\Users\\\\huangshengting\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\node\\\\bin\\\\node.exe\\\" scripts/validate-live.mjs --out .build\\\\verification\\\\live-npm-final --entry .build\\\\verification\\\\npm-installed\\\\node_modules\\\\portdoc\\\\bin\\\\portdoc.js --distro Ubuntu\",\n          \"cwd\": null,\n          \"projectPath\": null,\n          \"identitySource\": \"commandLine\"\n        }\n      ]\n    },\n    \"wsl\": {\n      \"status\": \"ok\",\n      \"distro\": \"Ubuntu\",\n      \"listeners\": []\n    },\n    \"docker\": {\n      \"status\": \"unavailable\",\n      \"executable\": \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\resources\\\\bin\\\\docker.exe\",\n      \"endpoint\": null,\n      \"mappings\": [],\n      \"reason\": \"Docker Desktop is installed, but its local engine is not running or cannot be accessed through docker_engine or dockerDesktopLinuxEngine. Start Docker Desktop and retry. Remote contexts are not inspected.\"\n    }\n  },\n  \"probes\": {\n    \"windows\": {\n      \"address\": \"127.0.0.1\",\n      \"family\": 4,\n      \"latencyMs\": 10,\n      \"status\": \"ok\",\n      \"reachable\": true\n    },\n    \"wsl\": {\n      \"address\": \"127.0.0.1\",\n      \"family\": 4,\n      \"status\": \"ok\",\n      \"reachable\": false,\n      \"reason\": \"ECONNREFUSED\",\n      \"latencyMs\": 2\n    }\n  },\n  \"endpointMatrix\": {\n    \"windows\": {\n      \"localhost\": {\n        \"address\": \"::1\",\n        \"family\": 6,\n        \"latencyMs\": 16,\n        \"status\": \"error\",\n        \"reachable\": null,\n        \"reason\": \"EACCES\"\n      },\n      \"ipv4\": {\n        \"address\": \"127.0.0.1\",\n        \"family\": 4,\n        \"latencyMs\": 10,\n        \"status\": \"ok\",\n        \"reachable\": true\n      },\n      \"ipv6\": {\n        \"address\": \"::1\",\n        \"family\": 6,\n        \"latencyMs\": 10,\n        \"status\": \"error\",\n        \"reachable\": null,\n        \"reason\": \"EACCES\"\n      }\n    },\n    \"wsl\": {\n      \"localhost\": {\n        \"address\": \"127.0.0.1\",\n        \"family\": 4,\n        \"status\": \"ok\",\n        \"reachable\": false,\n        \"reason\": \"ECONNREFUSED\",\n        \"latencyMs\": 2\n      },\n      \"ipv4\": {\n        \"address\": \"127.0.0.1\",\n        \"family\": 4,\n        \"status\": \"ok\",\n        \"reachable\": false,\n        \"reason\": \"ECONNREFUSED\",\n        \"latencyMs\": 2\n      },\n      \"ipv6\": {\n        \"address\": \"::1\",\n        \"family\": 6,\n        \"status\": \"ok\",\n        \"reachable\": false,\n        \"reason\": \"ECONNREFUSED\",\n        \"latencyMs\": 2\n      }\n    }\n  },\n  \"reservations\": {\n    \"status\": \"ok\",\n    \"ranges\": [\n      {\n        \"family\": 4,\n        \"start\": 50000,\n        \"end\": 50059,\n        \"administered\": true\n      },\n      {\n        \"family\": 4,\n        \"start\": 57354,\n        \"end\": 57453,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57472,\n        \"end\": 57571,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57644,\n        \"end\": 57743,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57744,\n        \"end\": 57843,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57844,\n        \"end\": 57943,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57944,\n        \"end\": 58043,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58044,\n        \"end\": 58143,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58144,\n        \"end\": 58243,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58244,\n        \"end\": 58343,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58344,\n        \"end\": 58443,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58444,\n        \"end\": 58543,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 50000,\n        \"end\": 50059,\n        \"administered\": true\n      },\n      {\n        \"family\": 6,\n        \"start\": 57354,\n        \"end\": 57453,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57472,\n        \"end\": 57571,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57644,\n        \"end\": 57743,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57744,\n        \"end\": 57843,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57844,\n        \"end\": 57943,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57944,\n        \"end\": 58043,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58044,\n        \"end\": 58143,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58144,\n        \"end\": 58243,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58244,\n        \"end\": 58343,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58344,\n        \"end\": 58443,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58444,\n        \"end\": 58543,\n        \"administered\": false\n      }\n    ],\n    \"matches\": [],\n    \"families\": {\n      \"ipv4\": {\n        \"status\": \"ok\"\n      },\n      \"ipv6\": {\n        \"status\": \"ok\"\n      }\n    }\n  },\n  \"assessment\": {\n    \"verdict\": \"OK\",\n    \"summary\": \"Windows owns this port with 1 listener.\",\n    \"confidence\": \"medium\",\n    \"findings\": [\n      {\n        \"severity\": \"low\",\n        \"code\": \"PARTIAL_INSPECTION\",\n        \"message\": \"Owner found, but could not inspect: docker.\"\n      },\n      {\n        \"severity\": \"low\",\n        \"code\": \"PARTIAL_PROBES\",\n        \"message\": \"An owner was found, but one or more endpoint probes could not run. Unchecked endpoints have unknown reachability.\"\n      }\n    ]\n  },\n  \"nextActions\": [\n    {\n      \"source\": \"windows\",\n      \"code\": \"VERIFY_WINDOWS_PROCESS\",\n      \"command\": \"Get-Process -Id 37180\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "stdoutEncoding": "utf8",
+          "stderrEncoding": "utf8",
+          "timedOut": false,
+          "evidence": "ipv4-cli.process.json"
+        },
+        "report": {
+          "schemaVersion": 3,
+          "kind": "diagnosis",
+          "checkedAt": "2026-10-31T08:32:45.823Z",
+          "port": 61421,
+          "protocol": "tcp",
+          "target": "127.0.0.1",
+          "sources": {
+            "windows": {
+              "status": "ok",
+              "listeners": [
+                {
+                  "address": "127.0.0.1",
+                  "port": 61421,
+                  "pid": 37180,
+                  "process": "node",
+                  "path": "C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+                  "commandLine": "\"C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/validate-live.mjs --out .build\\verification\\live-npm-final --entry .build\\verification\\npm-installed\\node_modules\\portdoc\\bin\\portdoc.js --distro Ubuntu",
+                  "cwd": null,
+                  "projectPath": null,
+                  "identitySource": "commandLine"
+                }
+              ]
+            },
+            "wsl": {
+              "status": "ok",
+              "distro": "Ubuntu",
+              "listeners": []
+            },
+            "docker": {
+              "status": "unavailable",
+              "executable": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe",
+              "endpoint": null,
+              "mappings": [],
+              "reason": "Docker Desktop is installed, but its local engine is not running or cannot be accessed through docker_engine or dockerDesktopLinuxEngine. Start Docker Desktop and retry. Remote contexts are not inspected."
+            }
+          },
+          "probes": {
+            "windows": {
+              "address": "127.0.0.1",
+              "family": 4,
+              "latencyMs": 10,
+              "status": "ok",
+              "reachable": true
+            },
+            "wsl": {
+              "address": "127.0.0.1",
+              "family": 4,
+              "status": "ok",
+              "reachable": false,
+              "reason": "ECONNREFUSED",
+              "latencyMs": 2
+            }
+          },
+          "endpointMatrix": {
+            "windows": {
+              "localhost": {
+                "address": "::1",
+                "family": 6,
+                "latencyMs": 16,
+                "status": "error",
+                "reachable": null,
+                "reason": "EACCES"
+              },
+              "ipv4": {
+                "address": "127.0.0.1",
+                "family": 4,
+                "latencyMs": 10,
+                "status": "ok",
+                "reachable": true
+              },
+              "ipv6": {
+                "address": "::1",
+                "family": 6,
+                "latencyMs": 10,
+                "status": "error",
+                "reachable": null,
+                "reason": "EACCES"
+              }
+            },
+            "wsl": {
+              "localhost": {
+                "address": "127.0.0.1",
+                "family": 4,
+                "status": "ok",
+                "reachable": false,
+                "reason": "ECONNREFUSED",
+                "latencyMs": 2
+              },
+              "ipv4": {
+                "address": "127.0.0.1",
+                "family": 4,
+                "status": "ok",
+                "reachable": false,
+                "reason": "ECONNREFUSED",
+                "latencyMs": 2
+              },
+              "ipv6": {
+                "address": "::1",
+                "family": 6,
+                "status": "ok",
+                "reachable": false,
+                "reason": "ECONNREFUSED",
+                "latencyMs": 2
+              }
+            }
+          },
+          "reservations": {
+            "status": "ok",
+            "ranges": [
+              {
+                "family": 4,
+                "start": 50000,
+                "end": 50059,
+                "administered": true
+              },
+              {
+                "family": 4,
+                "start": 57354,
+                "end": 57453,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57472,
+                "end": 57571,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57644,
+                "end": 57743,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57744,
+                "end": 57843,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57844,
+                "end": 57943,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57944,
+                "end": 58043,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58044,
+                "end": 58143,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58144,
+                "end": 58243,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58244,
+                "end": 58343,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58344,
+                "end": 58443,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58444,
+                "end": 58543,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 50000,
+                "end": 50059,
+                "administered": true
+              },
+              {
+                "family": 6,
+                "start": 57354,
+                "end": 57453,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57472,
+                "end": 57571,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57644,
+                "end": 57743,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57744,
+                "end": 57843,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57844,
+                "end": 57943,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57944,
+                "end": 58043,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58044,
+                "end": 58143,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58144,
+                "end": 58243,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58244,
+                "end": 58343,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58344,
+                "end": 58443,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58444,
+                "end": 58543,
+                "administered": false
+              }
+            ],
+            "matches": [],
+            "families": {
+              "ipv4": {
+                "status": "ok"
+              },
+              "ipv6": {
+                "status": "ok"
+              }
+            }
+          },
+          "assessment": {
+            "verdict": "OK",
+            "summary": "Windows owns this port with 1 listener.",
+            "confidence": "medium",
+            "findings": [
+              {
+                "severity": "low",
+                "code": "PARTIAL_INSPECTION",
+                "message": "Owner found, but could not inspect: docker."
+              },
+              {
+                "severity": "low",
+                "code": "PARTIAL_PROBES",
+                "message": "An owner was found, but one or more endpoint probes could not run. Unchecked endpoints have unknown reachability."
+              }
+            ]
+          },
+          "nextActions": [
+            {
+              "source": "windows",
+              "code": "VERIFY_WINDOWS_PROCESS",
+              "command": "Get-Process -Id 37180"
+            }
+          ]
+        }
+      },
+      "checks": [
+        {
+          "id": "independent-listener-pid",
+          "status": "pass",
+          "expected": {
+            "pid": 37180,
+            "address": "127.0.0.1",
+            "port": 61421
+          },
+          "actual": [
+            {
+              "LocalAddress": "127.0.0.1",
+              "LocalPort": 61421,
+              "OwningProcess": 37180
+            }
+          ]
+        },
+        {
+          "id": "independent-ipv4-connect",
+          "status": "pass",
+          "expected": true,
+          "actual": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "port": 61421,
+            "status": "connected",
+            "reachable": true,
+            "reason": null,
+            "elapsedMs": 1
+          }
+        },
+        {
+          "id": "cli-json-contract",
+          "status": "pass",
+          "expected": "diagnosis schemaVersion 3 JSON with a recognized verdict",
+          "actual": {
+            "schemaVersion": 3,
+            "kind": "diagnosis",
+            "verdict": "OK"
+          }
+        },
+        {
+          "id": "cli-exit-matches-verdict",
+          "status": "pass",
+          "expected": 0,
+          "actual": {
+            "exitCode": 0,
+            "timedOut": false,
+            "error": null
+          }
+        },
+        {
+          "id": "cli-listener-pid",
+          "status": "pass",
+          "expected": {
+            "pid": 37180,
+            "address": "127.0.0.1",
+            "port": 61421
+          },
+          "actual": {
+            "status": "ok",
+            "listeners": [
+              {
+                "address": "127.0.0.1",
+                "port": 61421,
+                "pid": 37180,
+                "process": "node",
+                "path": "C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+                "commandLine": "\"C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/validate-live.mjs --out .build\\verification\\live-npm-final --entry .build\\verification\\npm-installed\\node_modules\\portdoc\\bin\\portdoc.js --distro Ubuntu",
+                "cwd": null,
+                "projectPath": null,
+                "identitySource": "commandLine"
+              }
+            ]
+          }
+        },
+        {
+          "id": "windows-matrix-present",
+          "status": "pass",
+          "expected": "endpoint matrix",
+          "actual": {
+            "localhost": {
+              "address": "::1",
+              "family": 6,
+              "latencyMs": 16,
+              "status": "error",
+              "reachable": null,
+              "reason": "EACCES"
+            },
+            "ipv4": {
+              "address": "127.0.0.1",
+              "family": 4,
+              "latencyMs": 10,
+              "status": "ok",
+              "reachable": true
+            },
+            "ipv6": {
+              "address": "::1",
+              "family": 6,
+              "latencyMs": 10,
+              "status": "error",
+              "reachable": null,
+              "reason": "EACCES"
+            }
+          }
+        },
+        {
+          "id": "windows-localhost-first-address",
+          "status": "pass",
+          "expected": {
+            "address": "::1",
+            "family": 6
+          },
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 16,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-localhost-reachability",
+          "status": "pass",
+          "expected": {
+            "address": "::1",
+            "family": 6,
+            "port": 61421,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES",
+            "elapsedMs": 1
+          },
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 16,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-localhost-restriction-explicit",
+          "status": "pass",
+          "expected": "restriction remains unknown, never a refusal",
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 16,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-ipv4-reachability",
+          "status": "pass",
+          "expected": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "port": 61421,
+            "status": "connected",
+            "reachable": true,
+            "reason": null,
+            "elapsedMs": 1
+          },
+          "actual": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "latencyMs": 10,
+            "status": "ok",
+            "reachable": true
+          }
+        },
+        {
+          "id": "windows-ipv4-probe-status",
+          "status": "pass",
+          "expected": "A completed connection/refusal probe has status ok",
+          "actual": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "latencyMs": 10,
+            "status": "ok",
+            "reachable": true
+          }
+        },
+        {
+          "id": "windows-ipv4-literal-address",
+          "status": "pass",
+          "expected": {
+            "address": "127.0.0.1",
+            "family": 4
+          },
+          "actual": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "latencyMs": 10,
+            "status": "ok",
+            "reachable": true
+          }
+        },
+        {
+          "id": "windows-ipv6-reachability",
+          "status": "pass",
+          "expected": {
+            "address": "::1",
+            "family": 6,
+            "port": 61421,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES",
+            "elapsedMs": 1
+          },
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 10,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-ipv6-restriction-explicit",
+          "status": "pass",
+          "expected": "restriction remains unknown, never a refusal",
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 10,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-ipv6-literal-address",
+          "status": "pass",
+          "expected": {
+            "address": "::1",
+            "family": 6
+          },
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 10,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        }
+      ],
+      "scope": {
+        "purpose": "Compare a real Windows IPv4 listener with independent listener and endpoint observations.",
+        "environmentLimitations": [
+          {
+            "kind": "socket",
+            "address": "::1",
+            "family": 6,
+            "reason": "EACCES",
+            "status": "error"
+          }
+        ]
+      },
+      "localhostIpv6MismatchCoverage": {
+        "status": "not-covered",
+        "reason": "Requires actual IPv6-first localhost resolution and a usable IPv6 refusal/unreachable result; EACCES is not refusal."
+      },
+      "status": "environment-limited"
+    },
+    {
+      "id": "missing-docker-closed-port",
+      "port": 61421,
+      "independent": {
+        "listeners": {
+          "process": {
+            "file": "powershell.exe",
+            "args": [
+              "-NoProfile",
+              "-NonInteractive",
+              "-EncodedCommand",
+              "WwBDAG8AbgBzAG8AbABlAF0AOgA6AE8AdQB0AHAAdQB0AEUAbgBjAG8AZABpAG4AZwAgAD0AIABbAFQAZQB4AHQALgBVAFQARgA4AEUAbgBjAG8AZABpAG4AZwBdADoAOgBuAGUAdwAoACQAZgBhAGwAcwBlACkACgAkAEUAcgByAG8AcgBBAGMAdABpAG8AbgBQAHIAZQBmAGUAcgBlAG4AYwBlAD0AJwBTAHQAbwBwACcACgAkAHIAbwB3AHMAIAA9ACAAQAAoAEcAZQB0AC0ATgBlAHQAVABDAFAAQwBvAG4AbgBlAGMAdABpAG8AbgAgAC0AUwB0AGEAdABlACAATABpAHMAdABlAG4AIAAtAEUAcgByAG8AcgBBAGMAdABpAG8AbgAgAFMAdABvAHAAIAB8ACAAVwBoAGUAcgBlAC0ATwBiAGoAZQBjAHQAIAB7ACAAJABfAC4ATABvAGMAYQBsAFAAbwByAHQAIAAtAGUAcQAgADYAMQA0ADIAMQAgAH0AKQAKAEMAbwBuAHYAZQByAHQAVABvAC0ASgBzAG8AbgAgAC0ASQBuAHAAdQB0AE8AYgBqAGUAYwB0ACAAQAAoACQAcgBvAHcAcwAgAHwAIABTAGUAbABlAGMAdAAtAE8AYgBqAGUAYwB0ACAATABvAGMAYQBsAEEAZABkAHIAZQBzAHMALABMAG8AYwBhAGwAUABvAHIAdAAsAE8AdwBuAGkAbgBnAFAAcgBvAGMAZQBzAHMAKQAgAC0AQwBvAG0AcAByAGUAcwBzAA=="
+            ],
+            "pid": 48976,
+            "startedAt": "2026-10-31T08:32:45.833Z",
+            "elapsedMs": 2482,
+            "exitCode": 0,
+            "signal": null,
+            "error": null,
+            "stdout": "[]\r\n",
+            "stderr": "#< CLIXML\r\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S=\"progress\" RefId=\"1\"><TNRef RefId=\"0\" /><MS><I64 N=\"SourceId\">2</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S=\"progress\" RefId=\"2\"><TNRef RefId=\"0\" /><MS><I64 N=\"SourceId\">3</I64><PR N=\"Record\"><AV>Get-NetTCPConnection -State Listen -ErrorAction Stop | Where-Object { $_.LocalPort -eq 61421 })</AV><AI>1135568052</AI><Nil /><PI>-1</PI><PC>100</PC><T>Completed</T><SR>0</SR><SD>已完成 1/1</SD></PR></MS></Obj></Objs>",
+            "stdoutEncoding": "utf8",
+            "stderrEncoding": "utf8",
+            "timedOut": false,
+            "evidence": "closed-get-net-tcp.process.json"
+          },
+          "rows": []
+        },
+        "socket": {
+          "address": "127.0.0.1",
+          "family": 4,
+          "port": 61421,
+          "status": "unreachable",
+          "reachable": false,
+          "reason": "ECONNREFUSED",
+          "elapsedMs": 1
+        },
+        "availability": {
+          "file": "powershell.exe",
+          "args": [
+            "-NoProfile",
+            "-NonInteractive",
+            "-EncodedCommand",
+            "WwBDAG8AbgBzAG8AbABlAF0AOgA6AE8AdQB0AHAAdQB0AEUAbgBjAG8AZABpAG4AZwAgAD0AIABbAFQAZQB4AHQALgBVAFQARgA4AEUAbgBjAG8AZABpAG4AZwBdADoAOgBuAGUAdwAoACQAZgBhAGwAcwBlACkACgAkAEUAcgByAG8AcgBBAGMAdABpAG8AbgBQAHIAZQBmAGUAcgBlAG4AYwBlAD0AJwBTAHQAbwBwACcACgBDAG8AbgB2AGUAcgB0AFQAbwAtAEoAcwBvAG4AIAAtAEkAbgBwAHUAdABPAGIAagBlAGMAdAAgACgAWwBQAFMAQwB1AHMAdABvAG0ATwBiAGoAZQBjAHQAXQBAAHsAIABwAGEAdABoAEUAeABpAHMAdABzACAAPQAgAFQAZQBzAHQALQBQAGEAdABoACAALQBMAGkAdABlAHIAYQBsAFAAYQB0AGgAIAAnAEQAOgBcAE4AZQB3ACEAIQAhAFwAdwBzAGwALQBwAG8AcgB0AC0AZABvAGMAdABvAHIAXAAuAGIAdQBpAGwAZABcAHYAZQByAGkAZgBpAGMAYQB0AGkAbwBuAFwAbABpAHYAZQAtAG4AcABtAC0AZgBpAG4AYQBsAFwAZABvAGUAcwAtAG4AbwB0AC0AZQB4AGkAcwB0AC0AZABvAGMAawBlAHIALQBhADIAYwA5AGUANQA2ADcALQBhADQAMwBhAC0ANABiAGIANwAtADgAYQBkADIALQBkADUAMgAzADMAZQBkADUAMwA5ADMANAAuAGUAeABlACcAOwAgAGQAbwBjAGsAZQByAEMAbwBtAG0AYQBuAGQAcwAgAD0AIABAACgARwBlAHQALQBDAG8AbQBtAGEAbgBkACAAZABvAGMAawBlAHIAIAAtAEUAcgByAG8AcgBBAGMAdABpAG8AbgAgAFMAaQBsAGUAbgB0AGwAeQBDAG8AbgB0AGkAbgB1AGUAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAE4AYQBtAGUALABTAG8AdQByAGMAZQAsAEMAbwBtAG0AYQBuAGQAVAB5AHAAZQApACAAfQApACAALQBEAGUAcAB0AGgAIAA1ACAALQBDAG8AbQBwAHIAZQBzAHMA"
+          ],
+          "pid": 47708,
+          "startedAt": "2026-10-31T08:32:48.324Z",
+          "elapsedMs": 699,
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "stdout": "{\"pathExists\":false,\"dockerCommands\":[]}\r\n",
+          "stderr": "#< CLIXML\r\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S=\"progress\" RefId=\"1\"><TNRef RefId=\"0\" /><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S=\"progress\" RefId=\"2\"><TNRef RefId=\"0\" /><MS><I64 N=\"SourceId\">2</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S=\"progress\" RefId=\"3\"><TNRef RefId=\"0\" /><MS><I64 N=\"SourceId\">2</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>",
+          "stdoutEncoding": "utf8",
+          "stderrEncoding": "utf8",
+          "timedOut": false,
+          "evidence": "missing-docker-test-path.process.json"
+        },
+        "missing": {
+          "file": "D:\\New!!!\\wsl-port-doctor\\.build\\verification\\live-npm-final\\does-not-exist-docker-a2c9e567-a43a-4bb7-8ad2-d5233ed53934.exe",
+          "args": [
+            "--version"
+          ],
+          "pid": null,
+          "startedAt": "2026-10-31T08:32:49.023Z",
+          "elapsedMs": 1,
+          "exitCode": -4058,
+          "signal": null,
+          "error": {
+            "code": "ENOENT",
+            "message": "spawn D:\\New!!!\\wsl-port-doctor\\.build\\verification\\live-npm-final\\does-not-exist-docker-a2c9e567-a43a-4bb7-8ad2-d5233ed53934.exe ENOENT"
+          },
+          "stdout": "",
+          "stderr": "",
+          "stdoutEncoding": "utf8",
+          "stderrEncoding": "utf8",
+          "timedOut": false,
+          "evidence": "missing-docker-spawn.process.json"
+        }
+      },
+      "cli": {
+        "process": {
+          "file": "C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "args": [
+            "D:\\New!!!\\wsl-port-doctor\\.build\\verification\\npm-installed\\node_modules\\portdoc\\bin\\portdoc.js",
+            "61421",
+            "--json",
+            "--timeout",
+            "4000",
+            "--distro",
+            "Ubuntu",
+            "--docker-path",
+            "D:\\New!!!\\wsl-port-doctor\\.build\\verification\\live-npm-final\\does-not-exist-docker-a2c9e567-a43a-4bb7-8ad2-d5233ed53934.exe"
+          ],
+          "pid": 46784,
+          "startedAt": "2026-10-31T08:32:49.025Z",
+          "elapsedMs": 373,
+          "exitCode": 2,
+          "signal": null,
+          "error": null,
+          "stdout": "{\n  \"schemaVersion\": 3,\n  \"kind\": \"diagnosis\",\n  \"checkedAt\": \"2026-10-31T08:32:49.389Z\",\n  \"port\": 61421,\n  \"protocol\": \"tcp\",\n  \"target\": \"127.0.0.1\",\n  \"sources\": {\n    \"windows\": {\n      \"status\": \"ok\",\n      \"listeners\": []\n    },\n    \"wsl\": {\n      \"status\": \"ok\",\n      \"distro\": \"Ubuntu\",\n      \"listeners\": []\n    },\n    \"docker\": {\n      \"status\": \"unavailable\",\n      \"executable\": null,\n      \"endpoint\": null,\n      \"mappings\": [],\n      \"reason\": \"Docker CLI was not found at D:\\\\New!!!\\\\wsl-port-doctor\\\\.build\\\\verification\\\\live-npm-final\\\\does-not-exist-docker-a2c9e567-a43a-4bb7-8ad2-d5233ed53934.exe.\"\n    }\n  },\n  \"probes\": {\n    \"windows\": {\n      \"address\": \"127.0.0.1\",\n      \"family\": 4,\n      \"latencyMs\": 10,\n      \"status\": \"ok\",\n      \"reachable\": false,\n      \"reason\": \"ECONNREFUSED\"\n    },\n    \"wsl\": {\n      \"address\": \"127.0.0.1\",\n      \"family\": 4,\n      \"status\": \"ok\",\n      \"reachable\": false,\n      \"reason\": \"ECONNREFUSED\",\n      \"latencyMs\": 2\n    }\n  },\n  \"endpointMatrix\": {\n    \"windows\": {\n      \"localhost\": {\n        \"address\": \"::1\",\n        \"family\": 6,\n        \"latencyMs\": 14,\n        \"status\": \"error\",\n        \"reachable\": null,\n        \"reason\": \"EACCES\"\n      },\n      \"ipv4\": {\n        \"address\": \"127.0.0.1\",\n        \"family\": 4,\n        \"latencyMs\": 10,\n        \"status\": \"ok\",\n        \"reachable\": false,\n        \"reason\": \"ECONNREFUSED\"\n      },\n      \"ipv6\": {\n        \"address\": \"::1\",\n        \"family\": 6,\n        \"latencyMs\": 9,\n        \"status\": \"error\",\n        \"reachable\": null,\n        \"reason\": \"EACCES\"\n      }\n    },\n    \"wsl\": {\n      \"localhost\": {\n        \"address\": \"127.0.0.1\",\n        \"family\": 4,\n        \"status\": \"ok\",\n        \"reachable\": false,\n        \"reason\": \"ECONNREFUSED\",\n        \"latencyMs\": 2\n      },\n      \"ipv4\": {\n        \"address\": \"127.0.0.1\",\n        \"family\": 4,\n        \"status\": \"ok\",\n        \"reachable\": false,\n        \"reason\": \"ECONNREFUSED\",\n        \"latencyMs\": 2\n      },\n      \"ipv6\": {\n        \"address\": \"::1\",\n        \"family\": 6,\n        \"status\": \"ok\",\n        \"reachable\": false,\n        \"reason\": \"ECONNREFUSED\",\n        \"latencyMs\": 1\n      }\n    }\n  },\n  \"reservations\": {\n    \"status\": \"ok\",\n    \"ranges\": [\n      {\n        \"family\": 4,\n        \"start\": 50000,\n        \"end\": 50059,\n        \"administered\": true\n      },\n      {\n        \"family\": 4,\n        \"start\": 57354,\n        \"end\": 57453,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57472,\n        \"end\": 57571,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57644,\n        \"end\": 57743,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57744,\n        \"end\": 57843,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57844,\n        \"end\": 57943,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57944,\n        \"end\": 58043,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58044,\n        \"end\": 58143,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58144,\n        \"end\": 58243,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58244,\n        \"end\": 58343,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58344,\n        \"end\": 58443,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58444,\n        \"end\": 58543,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 50000,\n        \"end\": 50059,\n        \"administered\": true\n      },\n      {\n        \"family\": 6,\n        \"start\": 57354,\n        \"end\": 57453,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57472,\n        \"end\": 57571,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57644,\n        \"end\": 57743,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57744,\n        \"end\": 57843,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57844,\n        \"end\": 57943,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57944,\n        \"end\": 58043,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58044,\n        \"end\": 58143,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58144,\n        \"end\": 58243,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58244,\n        \"end\": 58343,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58344,\n        \"end\": 58443,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58444,\n        \"end\": 58543,\n        \"administered\": false\n      }\n    ],\n    \"matches\": [],\n    \"families\": {\n      \"ipv4\": {\n        \"status\": \"ok\"\n      },\n      \"ipv6\": {\n        \"status\": \"ok\"\n      }\n    }\n  },\n  \"assessment\": {\n    \"verdict\": \"UNKNOWN\",\n    \"summary\": \"No owner was found, but the evidence is incomplete or contradictory.\",\n    \"confidence\": \"low\",\n    \"findings\": [\n      {\n        \"severity\": \"medium\",\n        \"code\": \"INCOMPLETE_EVIDENCE\",\n        \"message\": \"Could not fully inspect: docker.\"\n      },\n      {\n        \"severity\": \"medium\",\n        \"code\": \"INCOMPLETE_PROBES\",\n        \"message\": \"One or more endpoint probes could not run; an unchecked endpoint is not evidence of a free port.\"\n      }\n    ]\n  },\n  \"nextActions\": []\n}\n",
+          "stderr": "",
+          "stdoutEncoding": "utf8",
+          "stderrEncoding": "utf8",
+          "timedOut": false,
+          "evidence": "missing-docker-cli.process.json"
+        },
+        "report": {
+          "schemaVersion": 3,
+          "kind": "diagnosis",
+          "checkedAt": "2026-10-31T08:32:49.389Z",
+          "port": 61421,
+          "protocol": "tcp",
+          "target": "127.0.0.1",
+          "sources": {
+            "windows": {
+              "status": "ok",
+              "listeners": []
+            },
+            "wsl": {
+              "status": "ok",
+              "distro": "Ubuntu",
+              "listeners": []
+            },
+            "docker": {
+              "status": "unavailable",
+              "executable": null,
+              "endpoint": null,
+              "mappings": [],
+              "reason": "Docker CLI was not found at D:\\New!!!\\wsl-port-doctor\\.build\\verification\\live-npm-final\\does-not-exist-docker-a2c9e567-a43a-4bb7-8ad2-d5233ed53934.exe."
+            }
+          },
+          "probes": {
+            "windows": {
+              "address": "127.0.0.1",
+              "family": 4,
+              "latencyMs": 10,
+              "status": "ok",
+              "reachable": false,
+              "reason": "ECONNREFUSED"
+            },
+            "wsl": {
+              "address": "127.0.0.1",
+              "family": 4,
+              "status": "ok",
+              "reachable": false,
+              "reason": "ECONNREFUSED",
+              "latencyMs": 2
+            }
+          },
+          "endpointMatrix": {
+            "windows": {
+              "localhost": {
+                "address": "::1",
+                "family": 6,
+                "latencyMs": 14,
+                "status": "error",
+                "reachable": null,
+                "reason": "EACCES"
+              },
+              "ipv4": {
+                "address": "127.0.0.1",
+                "family": 4,
+                "latencyMs": 10,
+                "status": "ok",
+                "reachable": false,
+                "reason": "ECONNREFUSED"
+              },
+              "ipv6": {
+                "address": "::1",
+                "family": 6,
+                "latencyMs": 9,
+                "status": "error",
+                "reachable": null,
+                "reason": "EACCES"
+              }
+            },
+            "wsl": {
+              "localhost": {
+                "address": "127.0.0.1",
+                "family": 4,
+                "status": "ok",
+                "reachable": false,
+                "reason": "ECONNREFUSED",
+                "latencyMs": 2
+              },
+              "ipv4": {
+                "address": "127.0.0.1",
+                "family": 4,
+                "status": "ok",
+                "reachable": false,
+                "reason": "ECONNREFUSED",
+                "latencyMs": 2
+              },
+              "ipv6": {
+                "address": "::1",
+                "family": 6,
+                "status": "ok",
+                "reachable": false,
+                "reason": "ECONNREFUSED",
+                "latencyMs": 1
+              }
+            }
+          },
+          "reservations": {
+            "status": "ok",
+            "ranges": [
+              {
+                "family": 4,
+                "start": 50000,
+                "end": 50059,
+                "administered": true
+              },
+              {
+                "family": 4,
+                "start": 57354,
+                "end": 57453,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57472,
+                "end": 57571,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57644,
+                "end": 57743,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57744,
+                "end": 57843,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57844,
+                "end": 57943,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57944,
+                "end": 58043,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58044,
+                "end": 58143,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58144,
+                "end": 58243,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58244,
+                "end": 58343,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58344,
+                "end": 58443,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58444,
+                "end": 58543,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 50000,
+                "end": 50059,
+                "administered": true
+              },
+              {
+                "family": 6,
+                "start": 57354,
+                "end": 57453,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57472,
+                "end": 57571,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57644,
+                "end": 57743,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57744,
+                "end": 57843,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57844,
+                "end": 57943,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57944,
+                "end": 58043,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58044,
+                "end": 58143,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58144,
+                "end": 58243,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58244,
+                "end": 58343,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58344,
+                "end": 58443,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58444,
+                "end": 58543,
+                "administered": false
+              }
+            ],
+            "matches": [],
+            "families": {
+              "ipv4": {
+                "status": "ok"
+              },
+              "ipv6": {
+                "status": "ok"
+              }
+            }
+          },
+          "assessment": {
+            "verdict": "UNKNOWN",
+            "summary": "No owner was found, but the evidence is incomplete or contradictory.",
+            "confidence": "low",
+            "findings": [
+              {
+                "severity": "medium",
+                "code": "INCOMPLETE_EVIDENCE",
+                "message": "Could not fully inspect: docker."
+              },
+              {
+                "severity": "medium",
+                "code": "INCOMPLETE_PROBES",
+                "message": "One or more endpoint probes could not run; an unchecked endpoint is not evidence of a free port."
+              }
+            ]
+          },
+          "nextActions": []
+        }
+      },
+      "checks": [
+        {
+          "id": "closed-port-independently-confirmed",
+          "status": "pass",
+          "expected": "No listening row and a failed literal IPv4 connection",
+          "actual": {
+            "rows": [],
+            "socket": {
+              "address": "127.0.0.1",
+              "family": 4,
+              "port": 61421,
+              "status": "unreachable",
+              "reachable": false,
+              "reason": "ECONNREFUSED",
+              "elapsedMs": 1
+            }
+          }
+        },
+        {
+          "id": "explicit-path-does-not-exist",
+          "status": "pass",
+          "expected": "Test-Path false and actual spawn ENOENT",
+          "actual": {
+            "availability": {
+              "pathExists": false,
+              "dockerCommands": []
+            },
+            "spawnError": {
+              "code": "ENOENT",
+              "message": "spawn D:\\New!!!\\wsl-port-doctor\\.build\\verification\\live-npm-final\\does-not-exist-docker-a2c9e567-a43a-4bb7-8ad2-d5233ed53934.exe ENOENT"
+            }
+          }
+        },
+        {
+          "id": "cli-json-contract",
+          "status": "pass",
+          "expected": "diagnosis schemaVersion 3 JSON with a recognized verdict",
+          "actual": {
+            "schemaVersion": 3,
+            "kind": "diagnosis",
+            "verdict": "UNKNOWN"
+          }
+        },
+        {
+          "id": "cli-exit-matches-verdict",
+          "status": "pass",
+          "expected": 2,
+          "actual": {
+            "exitCode": 2,
+            "timedOut": false,
+            "error": null
+          }
+        },
+        {
+          "id": "missing-docker-unavailable",
+          "status": "pass",
+          "expected": "unavailable with no mapping evidence",
+          "actual": {
+            "status": "unavailable",
+            "executable": null,
+            "endpoint": null,
+            "mappings": [],
+            "reason": "Docker CLI was not found at D:\\New!!!\\wsl-port-doctor\\.build\\verification\\live-npm-final\\does-not-exist-docker-a2c9e567-a43a-4bb7-8ad2-d5233ed53934.exe."
+          }
+        },
+        {
+          "id": "incomplete-evidence-never-free",
+          "status": "pass",
+          "expected": "verdict other than FREE",
+          "actual": {
+            "verdict": "UNKNOWN",
+            "summary": "No owner was found, but the evidence is incomplete or contradictory.",
+            "confidence": "low",
+            "findings": [
+              {
+                "severity": "medium",
+                "code": "INCOMPLETE_EVIDENCE",
+                "message": "Could not fully inspect: docker."
+              },
+              {
+                "severity": "medium",
+                "code": "INCOMPLETE_PROBES",
+                "message": "One or more endpoint probes could not run; an unchecked endpoint is not evidence of a free port."
+              }
+            ]
+          }
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "id": "wsl-listener-windows-observation",
+      "scope": {
+        "purpose": "Compare a real WSL listener and Windows/WSL access with independent observations.",
+        "environmentLimitations": [
+          {
+            "kind": "socket",
+            "address": "::1",
+            "family": 6,
+            "reason": "EACCES",
+            "status": "error"
+          }
+        ]
+      },
+      "checks": [
+        {
+          "id": "independent-wsl-listener",
+          "status": "pass",
+          "expected": {
+            "pid": 484,
+            "port": 42745,
+            "address": "127.0.0.1"
+          },
+          "actual": "LISTEN 0      128    127.0.0.1:42745 0.0.0.0:* users:((\"python3\",pid=484,fd=3))\n"
+        },
+        {
+          "id": "independent-wsl-connect-and-identity",
+          "status": "pass",
+          "expected": {
+            "reachable": true,
+            "tokenMatches": true
+          },
+          "actual": {
+            "pid": 484,
+            "tokenMatches": true,
+            "reachable": true
+          }
+        },
+        {
+          "id": "cli-json-contract",
+          "status": "pass",
+          "expected": "diagnosis schemaVersion 3 JSON with a recognized verdict",
+          "actual": {
+            "schemaVersion": 3,
+            "kind": "diagnosis",
+            "verdict": "UNKNOWN"
+          }
+        },
+        {
+          "id": "cli-exit-matches-verdict",
+          "status": "pass",
+          "expected": 2,
+          "actual": {
+            "exitCode": 2,
+            "timedOut": false,
+            "error": null
+          }
+        },
+        {
+          "id": "cli-wsl-listener-pid",
+          "status": "pass",
+          "expected": {
+            "pid": 484,
+            "port": 42745,
+            "token": "portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b"
+          },
+          "actual": {
+            "status": "ok",
+            "distro": "Ubuntu",
+            "listeners": [
+              {
+                "address": "127.0.0.1",
+                "port": 42745,
+                "state": "LISTEN",
+                "pid": 484,
+                "process": "python3",
+                "commandLine": "python3 -u -c 'import socket,time,os,json,sys s=socket.socket(socket.AF_INET,socket.SOCK_STREAM) s.bind(('\"'\"'127.0.0.1'\"'\"',0));s.listen();s.settimeout(0.5) print('\"'\"'PORTDOC_VALIDATION_READY='\"'\"'+json.dumps(dict(pid=os.getpid(),port=s.getsockname()[1],token=[REDACTED] end=time.monotonic()+90 while time.monotonic()<end:  try:   c,a=s.accept();c.close()  except socket.timeout: pass s.close()' portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b",
+                "cwd": "/mnt/d/New!!!/wsl-port-doctor",
+                "projectPath": "/mnt/d/New!!!/wsl-port-doctor",
+                "identitySource": "proc",
+                "path": "/usr/bin/python3.13"
+              }
+            ]
+          }
+        },
+        {
+          "id": "cli-wsl-ipv4-connect",
+          "status": "pass",
+          "expected": {
+            "pid": 484,
+            "tokenMatches": true,
+            "reachable": true
+          },
+          "actual": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "status": "ok",
+            "reachable": true,
+            "latencyMs": 2
+          }
+        },
+        {
+          "id": "windows-matrix-present",
+          "status": "pass",
+          "expected": "endpoint matrix",
+          "actual": {
+            "localhost": {
+              "address": "::1",
+              "family": 6,
+              "latencyMs": 12,
+              "status": "error",
+              "reachable": null,
+              "reason": "EACCES"
+            },
+            "ipv4": {
+              "address": "127.0.0.1",
+              "family": 4,
+              "latencyMs": 8,
+              "status": "ok",
+              "reachable": false,
+              "reason": "ECONNREFUSED"
+            },
+            "ipv6": {
+              "address": "::1",
+              "family": 6,
+              "latencyMs": 8,
+              "status": "error",
+              "reachable": null,
+              "reason": "EACCES"
+            }
+          }
+        },
+        {
+          "id": "windows-localhost-first-address",
+          "status": "pass",
+          "expected": {
+            "address": "::1",
+            "family": 6
+          },
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 12,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-localhost-reachability",
+          "status": "pass",
+          "expected": {
+            "address": "::1",
+            "family": 6,
+            "port": 42745,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES",
+            "elapsedMs": 0
+          },
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 12,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-localhost-restriction-explicit",
+          "status": "pass",
+          "expected": "restriction remains unknown, never a refusal",
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 12,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-ipv4-reachability",
+          "status": "pass",
+          "expected": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "port": 42745,
+            "status": "unreachable",
+            "reachable": false,
+            "reason": "ECONNREFUSED",
+            "elapsedMs": 0
+          },
+          "actual": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "latencyMs": 8,
+            "status": "ok",
+            "reachable": false,
+            "reason": "ECONNREFUSED"
+          }
+        },
+        {
+          "id": "windows-ipv4-probe-status",
+          "status": "pass",
+          "expected": "A completed connection/refusal probe has status ok",
+          "actual": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "latencyMs": 8,
+            "status": "ok",
+            "reachable": false,
+            "reason": "ECONNREFUSED"
+          }
+        },
+        {
+          "id": "windows-ipv4-literal-address",
+          "status": "pass",
+          "expected": {
+            "address": "127.0.0.1",
+            "family": 4
+          },
+          "actual": {
+            "address": "127.0.0.1",
+            "family": 4,
+            "latencyMs": 8,
+            "status": "ok",
+            "reachable": false,
+            "reason": "ECONNREFUSED"
+          }
+        },
+        {
+          "id": "windows-ipv6-reachability",
+          "status": "pass",
+          "expected": {
+            "address": "::1",
+            "family": 6,
+            "port": 42745,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES",
+            "elapsedMs": 0
+          },
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 8,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-ipv6-restriction-explicit",
+          "status": "pass",
+          "expected": "restriction remains unknown, never a refusal",
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 8,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "windows-ipv6-literal-address",
+          "status": "pass",
+          "expected": {
+            "address": "::1",
+            "family": 6
+          },
+          "actual": {
+            "address": "::1",
+            "family": 6,
+            "latencyMs": 8,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES"
+          }
+        },
+        {
+          "id": "cli-wsl-unreachable-finding",
+          "status": "pass",
+          "expected": "WSL_NOT_REACHABLE_FROM_WINDOWS and UNKNOWN",
+          "actual": {
+            "verdict": "UNKNOWN",
+            "summary": "A WSL listener exists, but the corresponding Windows loopback probes did not connect; review bindings and forwarding.",
+            "confidence": "medium",
+            "findings": [
+              {
+                "severity": "low",
+                "code": "ENDPOINT_FAMILY_MISMATCH",
+                "side": "wsl",
+                "message": "WSL: IPv4 and IPv6 loopback reachability differ. This can be an intentional service binding; use the endpoint matrix to choose a working address."
+              },
+              {
+                "severity": "medium",
+                "code": "WSL_NOT_REACHABLE_FROM_WINDOWS",
+                "message": "WSL reports a listener, but its corresponding Windows loopback probes did not connect. Check service bindings and forwarding; the TCP results do not identify the cause."
+              }
+            ]
+          }
+        },
+        {
+          "id": "owned-listener-cleanup-confirmed",
+          "status": "pass",
+          "expected": "Only token-verified own PID is signaled, then independently confirmed absent",
+          "actual": {
+            "pid": 484,
+            "tokenMatches": true,
+            "terminationRequested": true,
+            "ownedProcessStillAlive": false,
+            "alreadyExited": false
+          }
+        }
+      ],
+      "toolPreflight": {
+        "file": "wsl.exe",
+        "args": [
+          "--distribution",
+          "Ubuntu",
+          "--exec",
+          "sh",
+          "-c",
+          "command -v python3 && command -v ss"
+        ],
+        "pid": 32548,
+        "startedAt": "2026-10-31T08:32:49.406Z",
+        "elapsedMs": 152,
+        "exitCode": 0,
+        "signal": null,
+        "error": null,
+        "stdout": "/usr/bin/python3\n/usr/bin/ss\n",
+        "stderr": "",
+        "stdoutEncoding": "utf8",
+        "stderrEncoding": "utf8",
+        "timedOut": false,
+        "evidence": "wsl-tools.process.json"
+      },
+      "environmentSnapshot": {
+        "file": "wsl.exe",
+        "args": [
+          "--distribution",
+          "Ubuntu",
+          "--exec",
+          "sh",
+          "-c",
+          "uname -sr; if command -v wslinfo >/dev/null 2>&1; then wslinfo --networking-mode 2>/dev/null || true; else echo '__WSLINFO_UNAVAILABLE__'; fi"
+        ],
+        "pid": 20784,
+        "startedAt": "2026-10-31T08:32:49.558Z",
+        "elapsedMs": 172,
+        "exitCode": 0,
+        "signal": null,
+        "error": null,
+        "stdout": "Linux 6.18.33.2-microsoft-standard-WSL2\nnat\n",
+        "stderr": "",
+        "stdoutEncoding": "utf8",
+        "stderrEncoding": "utf8",
+        "timedOut": false,
+        "evidence": "wsl-environment.process.json"
+      },
+      "fixture": {
+        "pid": 484,
+        "port": 42745,
+        "token": "portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b"
+      },
+      "ss": {
+        "file": "wsl.exe",
+        "args": [
+          "--distribution",
+          "Ubuntu",
+          "--exec",
+          "ss",
+          "-H",
+          "-ltnp",
+          "sport = :42745"
+        ],
+        "pid": 44892,
+        "startedAt": "2026-10-31T08:32:49.858Z",
+        "elapsedMs": 98,
+        "exitCode": 0,
+        "signal": null,
+        "error": null,
+        "stdout": "LISTEN 0      128    127.0.0.1:42745 0.0.0.0:* users:((\"python3\",pid=484,fd=3))\n",
+        "stderr": "",
+        "stdoutEncoding": "utf8",
+        "stderrEncoding": "utf8",
+        "timedOut": false,
+        "evidence": "wsl-independent-ss.process.json"
+      },
+      "wslConnect": {
+        "file": "wsl.exe",
+        "args": [
+          "--distribution",
+          "Ubuntu",
+          "--exec",
+          "python3",
+          "-c",
+          "import socket,json,errno,sys\npid=484\nraw=open('/proc/%d/cmdline'%pid,'rb').read().split(b'\\0')\nr=dict(pid=pid,tokenMatches=\"portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b\".encode() in raw)\ntry:\n s=socket.create_connection(('127.0.0.1',42745),1.5);s.close();r.update(reachable=True)\nexcept OSError as e: r.update(reachable=None if e.errno in (errno.EACCES,errno.EPERM) else False,reason=errno.errorcode.get(e.errno,str(e)))\nprint(json.dumps(r))"
+        ],
+        "pid": 35716,
+        "startedAt": "2026-10-31T08:32:49.956Z",
+        "elapsedMs": 110,
+        "exitCode": 0,
+        "signal": null,
+        "error": null,
+        "stdout": "{\"pid\": 484, \"tokenMatches\": true, \"reachable\": true}\n",
+        "stderr": "",
+        "stdoutEncoding": "utf8",
+        "stderrEncoding": "utf8",
+        "timedOut": false,
+        "evidence": "wsl-independent-python-connect.process.json"
+      },
+      "windowsEndpoints": {
+        "port": 42745,
+        "dns": {
+          "addresses": [
+            {
+              "address": "::1",
+              "family": 6
+            },
+            {
+              "address": "127.0.0.1",
+              "family": 4
+            }
+          ],
+          "error": null,
+          "elapsedMs": 1
+        },
+        "sockets": [
+          {
+            "address": "::1",
+            "family": 6,
+            "port": 42745,
+            "status": "error",
+            "reachable": null,
+            "reason": "EACCES",
+            "elapsedMs": 0
+          },
+          {
+            "address": "127.0.0.1",
+            "family": 4,
+            "port": 42745,
+            "status": "unreachable",
+            "reachable": false,
+            "reason": "ECONNREFUSED",
+            "elapsedMs": 0
+          }
+        ]
+      },
+      "cli": {
+        "process": {
+          "file": "C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "args": [
+            "D:\\New!!!\\wsl-port-doctor\\.build\\verification\\npm-installed\\node_modules\\portdoc\\bin\\portdoc.js",
+            "42745",
+            "--json",
+            "--timeout",
+            "4000",
+            "--distro",
+            "Ubuntu"
+          ],
+          "pid": 40292,
+          "startedAt": "2026-10-31T08:32:50.074Z",
+          "elapsedMs": 431,
+          "exitCode": 2,
+          "signal": null,
+          "error": null,
+          "stdout": "{\n  \"schemaVersion\": 3,\n  \"kind\": \"diagnosis\",\n  \"checkedAt\": \"2026-10-31T08:32:50.497Z\",\n  \"port\": 42745,\n  \"protocol\": \"tcp\",\n  \"target\": \"127.0.0.1\",\n  \"sources\": {\n    \"windows\": {\n      \"status\": \"ok\",\n      \"listeners\": []\n    },\n    \"wsl\": {\n      \"status\": \"ok\",\n      \"distro\": \"Ubuntu\",\n      \"listeners\": [\n        {\n          \"address\": \"127.0.0.1\",\n          \"port\": 42745,\n          \"state\": \"LISTEN\",\n          \"pid\": 484,\n          \"process\": \"python3\",\n          \"commandLine\": \"python3 -u -c 'import socket,time,os,json,sys s=socket.socket(socket.AF_INET,socket.SOCK_STREAM) s.bind(('\\\"'\\\"'127.0.0.1'\\\"'\\\"',0));s.listen();s.settimeout(0.5) print('\\\"'\\\"'PORTDOC_VALIDATION_READY='\\\"'\\\"'+json.dumps(dict(pid=os.getpid(),port=s.getsockname()[1],token=[REDACTED] end=time.monotonic()+90 while time.monotonic()<end:  try:   c,a=s.accept();c.close()  except socket.timeout: pass s.close()' portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b\",\n          \"cwd\": \"/mnt/d/New!!!/wsl-port-doctor\",\n          \"projectPath\": \"/mnt/d/New!!!/wsl-port-doctor\",\n          \"identitySource\": \"proc\",\n          \"path\": \"/usr/bin/python3.13\"\n        }\n      ]\n    },\n    \"docker\": {\n      \"status\": \"unavailable\",\n      \"executable\": \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\resources\\\\bin\\\\docker.exe\",\n      \"endpoint\": null,\n      \"mappings\": [],\n      \"reason\": \"Docker Desktop is installed, but its local engine is not running or cannot be accessed through docker_engine or dockerDesktopLinuxEngine. Start Docker Desktop and retry. Remote contexts are not inspected.\"\n    }\n  },\n  \"probes\": {\n    \"windows\": {\n      \"address\": \"127.0.0.1\",\n      \"family\": 4,\n      \"latencyMs\": 8,\n      \"status\": \"ok\",\n      \"reachable\": false,\n      \"reason\": \"ECONNREFUSED\"\n    },\n    \"wsl\": {\n      \"address\": \"127.0.0.1\",\n      \"family\": 4,\n      \"status\": \"ok\",\n      \"reachable\": true,\n      \"latencyMs\": 2\n    }\n  },\n  \"endpointMatrix\": {\n    \"windows\": {\n      \"localhost\": {\n        \"address\": \"::1\",\n        \"family\": 6,\n        \"latencyMs\": 12,\n        \"status\": \"error\",\n        \"reachable\": null,\n        \"reason\": \"EACCES\"\n      },\n      \"ipv4\": {\n        \"address\": \"127.0.0.1\",\n        \"family\": 4,\n        \"latencyMs\": 8,\n        \"status\": \"ok\",\n        \"reachable\": false,\n        \"reason\": \"ECONNREFUSED\"\n      },\n      \"ipv6\": {\n        \"address\": \"::1\",\n        \"family\": 6,\n        \"latencyMs\": 8,\n        \"status\": \"error\",\n        \"reachable\": null,\n        \"reason\": \"EACCES\"\n      }\n    },\n    \"wsl\": {\n      \"localhost\": {\n        \"address\": \"127.0.0.1\",\n        \"family\": 4,\n        \"status\": \"ok\",\n        \"reachable\": true,\n        \"latencyMs\": 2\n      },\n      \"ipv4\": {\n        \"address\": \"127.0.0.1\",\n        \"family\": 4,\n        \"status\": \"ok\",\n        \"reachable\": true,\n        \"latencyMs\": 2\n      },\n      \"ipv6\": {\n        \"address\": \"::1\",\n        \"family\": 6,\n        \"status\": \"ok\",\n        \"reachable\": false,\n        \"reason\": \"ECONNREFUSED\",\n        \"latencyMs\": 1\n      }\n    }\n  },\n  \"reservations\": {\n    \"status\": \"ok\",\n    \"ranges\": [\n      {\n        \"family\": 4,\n        \"start\": 50000,\n        \"end\": 50059,\n        \"administered\": true\n      },\n      {\n        \"family\": 4,\n        \"start\": 57354,\n        \"end\": 57453,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57472,\n        \"end\": 57571,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57644,\n        \"end\": 57743,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57744,\n        \"end\": 57843,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57844,\n        \"end\": 57943,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 57944,\n        \"end\": 58043,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58044,\n        \"end\": 58143,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58144,\n        \"end\": 58243,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58244,\n        \"end\": 58343,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58344,\n        \"end\": 58443,\n        \"administered\": false\n      },\n      {\n        \"family\": 4,\n        \"start\": 58444,\n        \"end\": 58543,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 50000,\n        \"end\": 50059,\n        \"administered\": true\n      },\n      {\n        \"family\": 6,\n        \"start\": 57354,\n        \"end\": 57453,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57472,\n        \"end\": 57571,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57644,\n        \"end\": 57743,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57744,\n        \"end\": 57843,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57844,\n        \"end\": 57943,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 57944,\n        \"end\": 58043,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58044,\n        \"end\": 58143,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58144,\n        \"end\": 58243,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58244,\n        \"end\": 58343,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58344,\n        \"end\": 58443,\n        \"administered\": false\n      },\n      {\n        \"family\": 6,\n        \"start\": 58444,\n        \"end\": 58543,\n        \"administered\": false\n      }\n    ],\n    \"matches\": [],\n    \"families\": {\n      \"ipv4\": {\n        \"status\": \"ok\"\n      },\n      \"ipv6\": {\n        \"status\": \"ok\"\n      }\n    }\n  },\n  \"assessment\": {\n    \"verdict\": \"UNKNOWN\",\n    \"summary\": \"A WSL listener exists, but the corresponding Windows loopback probes did not connect; review bindings and forwarding.\",\n    \"confidence\": \"medium\",\n    \"findings\": [\n      {\n        \"severity\": \"low\",\n        \"code\": \"ENDPOINT_FAMILY_MISMATCH\",\n        \"side\": \"wsl\",\n        \"message\": \"WSL: IPv4 and IPv6 loopback reachability differ. This can be an intentional service binding; use the endpoint matrix to choose a working address.\"\n      },\n      {\n        \"severity\": \"medium\",\n        \"code\": \"WSL_NOT_REACHABLE_FROM_WINDOWS\",\n        \"message\": \"WSL reports a listener, but its corresponding Windows loopback probes did not connect. Check service bindings and forwarding; the TCP results do not identify the cause.\"\n      }\n    ]\n  },\n  \"nextActions\": [\n    {\n      \"source\": \"wsl\",\n      \"code\": \"VERIFY_WSL_PROCESS\",\n      \"command\": \"wsl -d 'Ubuntu' -- ps -p 484 -o pid,comm,args\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "stdoutEncoding": "utf8",
+          "stderrEncoding": "utf8",
+          "timedOut": false,
+          "evidence": "wsl-cli.process.json"
+        },
+        "report": {
+          "schemaVersion": 3,
+          "kind": "diagnosis",
+          "checkedAt": "2026-10-31T08:32:50.497Z",
+          "port": 42745,
+          "protocol": "tcp",
+          "target": "127.0.0.1",
+          "sources": {
+            "windows": {
+              "status": "ok",
+              "listeners": []
+            },
+            "wsl": {
+              "status": "ok",
+              "distro": "Ubuntu",
+              "listeners": [
+                {
+                  "address": "127.0.0.1",
+                  "port": 42745,
+                  "state": "LISTEN",
+                  "pid": 484,
+                  "process": "python3",
+                  "commandLine": "python3 -u -c 'import socket,time,os,json,sys s=socket.socket(socket.AF_INET,socket.SOCK_STREAM) s.bind(('\"'\"'127.0.0.1'\"'\"',0));s.listen();s.settimeout(0.5) print('\"'\"'PORTDOC_VALIDATION_READY='\"'\"'+json.dumps(dict(pid=os.getpid(),port=s.getsockname()[1],token=[REDACTED] end=time.monotonic()+90 while time.monotonic()<end:  try:   c,a=s.accept();c.close()  except socket.timeout: pass s.close()' portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b",
+                  "cwd": "/mnt/d/New!!!/wsl-port-doctor",
+                  "projectPath": "/mnt/d/New!!!/wsl-port-doctor",
+                  "identitySource": "proc",
+                  "path": "/usr/bin/python3.13"
+                }
+              ]
+            },
+            "docker": {
+              "status": "unavailable",
+              "executable": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe",
+              "endpoint": null,
+              "mappings": [],
+              "reason": "Docker Desktop is installed, but its local engine is not running or cannot be accessed through docker_engine or dockerDesktopLinuxEngine. Start Docker Desktop and retry. Remote contexts are not inspected."
+            }
+          },
+          "probes": {
+            "windows": {
+              "address": "127.0.0.1",
+              "family": 4,
+              "latencyMs": 8,
+              "status": "ok",
+              "reachable": false,
+              "reason": "ECONNREFUSED"
+            },
+            "wsl": {
+              "address": "127.0.0.1",
+              "family": 4,
+              "status": "ok",
+              "reachable": true,
+              "latencyMs": 2
+            }
+          },
+          "endpointMatrix": {
+            "windows": {
+              "localhost": {
+                "address": "::1",
+                "family": 6,
+                "latencyMs": 12,
+                "status": "error",
+                "reachable": null,
+                "reason": "EACCES"
+              },
+              "ipv4": {
+                "address": "127.0.0.1",
+                "family": 4,
+                "latencyMs": 8,
+                "status": "ok",
+                "reachable": false,
+                "reason": "ECONNREFUSED"
+              },
+              "ipv6": {
+                "address": "::1",
+                "family": 6,
+                "latencyMs": 8,
+                "status": "error",
+                "reachable": null,
+                "reason": "EACCES"
+              }
+            },
+            "wsl": {
+              "localhost": {
+                "address": "127.0.0.1",
+                "family": 4,
+                "status": "ok",
+                "reachable": true,
+                "latencyMs": 2
+              },
+              "ipv4": {
+                "address": "127.0.0.1",
+                "family": 4,
+                "status": "ok",
+                "reachable": true,
+                "latencyMs": 2
+              },
+              "ipv6": {
+                "address": "::1",
+                "family": 6,
+                "status": "ok",
+                "reachable": false,
+                "reason": "ECONNREFUSED",
+                "latencyMs": 1
+              }
+            }
+          },
+          "reservations": {
+            "status": "ok",
+            "ranges": [
+              {
+                "family": 4,
+                "start": 50000,
+                "end": 50059,
+                "administered": true
+              },
+              {
+                "family": 4,
+                "start": 57354,
+                "end": 57453,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57472,
+                "end": 57571,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57644,
+                "end": 57743,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57744,
+                "end": 57843,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57844,
+                "end": 57943,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 57944,
+                "end": 58043,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58044,
+                "end": 58143,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58144,
+                "end": 58243,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58244,
+                "end": 58343,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58344,
+                "end": 58443,
+                "administered": false
+              },
+              {
+                "family": 4,
+                "start": 58444,
+                "end": 58543,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 50000,
+                "end": 50059,
+                "administered": true
+              },
+              {
+                "family": 6,
+                "start": 57354,
+                "end": 57453,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57472,
+                "end": 57571,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57644,
+                "end": 57743,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57744,
+                "end": 57843,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57844,
+                "end": 57943,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 57944,
+                "end": 58043,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58044,
+                "end": 58143,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58144,
+                "end": 58243,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58244,
+                "end": 58343,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58344,
+                "end": 58443,
+                "administered": false
+              },
+              {
+                "family": 6,
+                "start": 58444,
+                "end": 58543,
+                "administered": false
+              }
+            ],
+            "matches": [],
+            "families": {
+              "ipv4": {
+                "status": "ok"
+              },
+              "ipv6": {
+                "status": "ok"
+              }
+            }
+          },
+          "assessment": {
+            "verdict": "UNKNOWN",
+            "summary": "A WSL listener exists, but the corresponding Windows loopback probes did not connect; review bindings and forwarding.",
+            "confidence": "medium",
+            "findings": [
+              {
+                "severity": "low",
+                "code": "ENDPOINT_FAMILY_MISMATCH",
+                "side": "wsl",
+                "message": "WSL: IPv4 and IPv6 loopback reachability differ. This can be an intentional service binding; use the endpoint matrix to choose a working address."
+              },
+              {
+                "severity": "medium",
+                "code": "WSL_NOT_REACHABLE_FROM_WINDOWS",
+                "message": "WSL reports a listener, but its corresponding Windows loopback probes did not connect. Check service bindings and forwarding; the TCP results do not identify the cause."
+              }
+            ]
+          },
+          "nextActions": [
+            {
+              "source": "wsl",
+              "code": "VERIFY_WSL_PROCESS",
+              "command": "wsl -d 'Ubuntu' -- ps -p 484 -o pid,comm,args"
+            }
+          ]
+        }
+      },
+      "windowsUnreachableVariant": {
+        "covered": true,
+        "reason": "The WSL listener accepted connections locally, while independent Windows IPv4 connection failed without a policy error or another reported owner."
+      },
+      "cleanup": {
+        "file": "wsl.exe",
+        "args": [
+          "--distribution",
+          "Ubuntu",
+          "--exec",
+          "python3",
+          "-c",
+          "import os,signal,json,time\np=484\ntoken=\"portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b\".encode()\ndef owned():\n try: return token in open('/proc/%d/cmdline'%p,'rb').read().split(b'\\0')\n except FileNotFoundError: return False\nwas_owned=owned()\nif was_owned:\n try: os.kill(p,signal.SIGTERM)\n except ProcessLookupError: pass\nfor attempt in range(20):\n if not owned(): break\n time.sleep(0.05)\nprint(json.dumps(dict(pid=p,tokenMatches=was_owned,terminationRequested=was_owned,ownedProcessStillAlive=owned(),alreadyExited=not was_owned)))"
+        ],
+        "pid": 44588,
+        "startedAt": "2026-10-31T08:32:50.506Z",
+        "elapsedMs": 148,
+        "exitCode": 0,
+        "signal": null,
+        "error": null,
+        "stdout": "{\"pid\": 484, \"tokenMatches\": true, \"terminationRequested\": true, \"ownedProcessStillAlive\": false, \"alreadyExited\": false}\n",
+        "stderr": "",
+        "stdoutEncoding": "utf8",
+        "stderrEncoding": "utf8",
+        "timedOut": false,
+        "evidence": "wsl-cleanup-owned-pid.process.json"
+      },
+      "listenerProcess": {
+        "file": "wsl.exe",
+        "args": [
+          "--distribution",
+          "Ubuntu",
+          "--exec",
+          "python3",
+          "-u",
+          "-c",
+          "import socket,time,os,json,sys\ns=socket.socket(socket.AF_INET,socket.SOCK_STREAM)\ns.bind(('127.0.0.1',0));s.listen();s.settimeout(0.5)\nprint('PORTDOC_VALIDATION_READY='+json.dumps(dict(pid=os.getpid(),port=s.getsockname()[1],token=sys.argv[1])),flush=True)\nend=time.monotonic()+90\nwhile time.monotonic()<end:\n try:\n  c,a=s.accept();c.close()\n except socket.timeout: pass\ns.close()",
+          "portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b"
+        ],
+        "pid": 43300,
+        "startedAt": "2026-10-31T08:32:49.732Z",
+        "elapsedMs": 923,
+        "exitCode": 15,
+        "signal": null,
+        "error": null,
+        "stdout": "PORTDOC_VALIDATION_READY={\"pid\": 484, \"port\": 42745, \"token\": \"portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b\"}\n",
+        "stderr": "",
+        "stdoutEncoding": "utf8",
+        "stderrEncoding": "utf8",
+        "finiteLifetimeSeconds": 90,
+        "evidence": "wsl-listener.process.json"
+      },
+      "status": "environment-limited"
+    }
+  ],
+  "limitations": [
+    "A single host run does not establish other Windows/WSL/Docker combinations.",
+    "TCP connects do not identify the application receiving traffic.",
+    "No Docker service is started and no real Docker mapping/exclusion-range scenario is created.",
+    "Checks run sequentially; unrelated processes and DNS results may change between observations.",
+    "IPv4 listening was observed, but the specific IPv6-first localhost refusal scenario was not reproduced; see ipv4-listener.case.json."
+  ],
+  "git": {
+    "file": "git",
+    "args": [
+      "-c",
+      "safe.directory=D:/New!!!/wsl-port-doctor",
+      "rev-parse",
+      "HEAD"
+    ],
+    "pid": 44616,
+    "startedAt": "2026-10-31T08:32:39.264Z",
+    "elapsedMs": 50,
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "7ee3c9061e1d787ae320af6bfeb82b3fdf351506\n",
+    "stderr": "",
+    "stdoutEncoding": "utf8",
+    "stderrEncoding": "utf8",
+    "timedOut": false,
+    "evidence": "git-revision.process.json"
+  },
+  "gitStatus": {
+    "file": "git",
+    "args": [
+      "-c",
+      "safe.directory=D:/New!!!/wsl-port-doctor",
+      "status",
+      "--porcelain"
+    ],
+    "pid": 10700,
+    "startedAt": "2026-10-31T08:32:39.315Z",
+    "elapsedMs": 65,
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "stdout": " M .github/workflows/release-exe.yml\n M CHANGELOG.md\n M docs/build.md\n M docs/validation.md\n M package.json\n M scripts/build-exe.mjs\n M src/version.js\n M test/probes.test.js\n M test/run-command.test.js\n?? docs/evidence/\n?? docs/validation-2026-10-31.md\n?? scripts/validate-live.mjs\n",
+    "stderr": "",
+    "stdoutEncoding": "utf8",
+    "stderrEncoding": "utf8",
+    "timedOut": false,
+    "evidence": "git-status.process.json"
+  },
+  "provenance": {
+    "entrySha256": "80667397b51c7af2b42dcec829162e8ebfc3059e34e7b86c4e595961cd2969fe",
+    "commandRunnerPath": "D:\\New!!!\\wsl-port-doctor\\src\\lib\\run-command.js",
+    "commandRunnerSha256": "d4efd0d2a8441e994896ff02d9b99519afb4f5c6196b1b6451abccc97e3e3e09",
+    "uncommittedChanges": true
+  },
+  "version": {
+    "file": "C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "args": [
+      "D:\\New!!!\\wsl-port-doctor\\.build\\verification\\npm-installed\\node_modules\\portdoc\\bin\\portdoc.js",
+      "--version"
+    ],
+    "pid": 41304,
+    "startedAt": "2026-10-31T08:32:39.389Z",
+    "elapsedMs": 92,
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "stdout": "0.7.1\n",
+    "stderr": "",
+    "stdoutEncoding": "utf8",
+    "stderrEncoding": "utf8",
+    "timedOut": false,
+    "evidence": "entry-version.process.json"
+  },
+  "wslPreflight": {
+    "status": {
+      "file": "wsl.exe",
+      "args": [
+        "--status"
+      ],
+      "pid": 47928,
+      "startedAt": "2026-10-31T08:32:39.481Z",
+      "elapsedMs": 53,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "stdout": "默认分发: Ubuntu\r\n默认版本: 2\r\n",
+      "stderr": "",
+      "stdoutEncoding": "utf16le",
+      "stderrEncoding": "utf8",
+      "timedOut": false,
+      "evidence": "wsl-status.process.json"
+    },
+    "verbose": {
+      "file": "wsl.exe",
+      "args": [
+        "--list",
+        "--verbose"
+      ],
+      "pid": 48040,
+      "startedAt": "2026-10-31T08:32:39.535Z",
+      "elapsedMs": 51,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "stdout": "  NAME              STATE           VERSION\r\n* Ubuntu            Stopped         2\r\n  docker-desktop    Stopped         2\r\n",
+      "stderr": "",
+      "stdoutEncoding": "utf16le",
+      "stderrEncoding": "utf8",
+      "timedOut": false,
+      "evidence": "wsl-list-verbose.process.json"
+    },
+    "quiet": {
+      "file": "wsl.exe",
+      "args": [
+        "--list",
+        "--quiet"
+      ],
+      "pid": 44696,
+      "startedAt": "2026-10-31T08:32:39.586Z",
+      "elapsedMs": 46,
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "stdout": "Ubuntu\r\ndocker-desktop\r\n",
+      "stderr": "",
+      "stdoutEncoding": "utf16le",
+      "stderrEncoding": "utf8",
+      "timedOut": false,
+      "evidence": "wsl-list-quiet.process.json"
+    },
+    "confirmedDistributions": [
+      "Ubuntu",
+      "docker-desktop"
+    ]
+  },
+  "finishedAt": "2026-10-31T08:32:50.656Z",
+  "status": "incomplete"
+}

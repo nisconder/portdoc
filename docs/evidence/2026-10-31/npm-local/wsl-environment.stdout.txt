@@ -1,0 +1,2 @@
+Linux 6.18.33.2-microsoft-standard-WSL2
+nat

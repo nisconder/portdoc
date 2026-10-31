@@ -1,0 +1,290 @@
+{
+  "schemaVersion": 3,
+  "kind": "diagnosis",
+  "checkedAt": "2026-10-31T08:32:45.823Z",
+  "port": 61421,
+  "protocol": "tcp",
+  "target": "127.0.0.1",
+  "sources": {
+    "windows": {
+      "status": "ok",
+      "listeners": [
+        {
+          "address": "127.0.0.1",
+          "port": 61421,
+          "pid": 37180,
+          "process": "node",
+          "path": "C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\huangshengting\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/validate-live.mjs --out .build\\verification\\live-npm-final --entry .build\\verification\\npm-installed\\node_modules\\portdoc\\bin\\portdoc.js --distro Ubuntu",
+          "cwd": null,
+          "projectPath": null,
+          "identitySource": "commandLine"
+        }
+      ]
+    },
+    "wsl": {
+      "status": "ok",
+      "distro": "Ubuntu",
+      "listeners": []
+    },
+    "docker": {
+      "status": "unavailable",
+      "executable": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe",
+      "endpoint": null,
+      "mappings": [],
+      "reason": "Docker Desktop is installed, but its local engine is not running or cannot be accessed through docker_engine or dockerDesktopLinuxEngine. Start Docker Desktop and retry. Remote contexts are not inspected."
+    }
+  },
+  "probes": {
+    "windows": {
+      "address": "127.0.0.1",
+      "family": 4,
+      "latencyMs": 10,
+      "status": "ok",
+      "reachable": true
+    },
+    "wsl": {
+      "address": "127.0.0.1",
+      "family": 4,
+      "status": "ok",
+      "reachable": false,
+      "reason": "ECONNREFUSED",
+      "latencyMs": 2
+    }
+  },
+  "endpointMatrix": {
+    "windows": {
+      "localhost": {
+        "address": "::1",
+        "family": 6,
+        "latencyMs": 16,
+        "status": "error",
+        "reachable": null,
+        "reason": "EACCES"
+      },
+      "ipv4": {
+        "address": "127.0.0.1",
+        "family": 4,
+        "latencyMs": 10,
+        "status": "ok",
+        "reachable": true
+      },
+      "ipv6": {
+        "address": "::1",
+        "family": 6,
+        "latencyMs": 10,
+        "status": "error",
+        "reachable": null,
+        "reason": "EACCES"
+      }
+    },
+    "wsl": {
+      "localhost": {
+        "address": "127.0.0.1",
+        "family": 4,
+        "status": "ok",
+        "reachable": false,
+        "reason": "ECONNREFUSED",
+        "latencyMs": 2
+      },
+      "ipv4": {
+        "address": "127.0.0.1",
+        "family": 4,
+        "status": "ok",
+        "reachable": false,
+        "reason": "ECONNREFUSED",
+        "latencyMs": 2
+      },
+      "ipv6": {
+        "address": "::1",
+        "family": 6,
+        "status": "ok",
+        "reachable": false,
+        "reason": "ECONNREFUSED",
+        "latencyMs": 2
+      }
+    }
+  },
+  "reservations": {
+    "status": "ok",
+    "ranges": [
+      {
+        "family": 4,
+        "start": 50000,
+        "end": 50059,
+        "administered": true
+      },
+      {
+        "family": 4,
+        "start": 57354,
+        "end": 57453,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57472,
+        "end": 57571,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57644,
+        "end": 57743,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57744,
+        "end": 57843,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57844,
+        "end": 57943,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57944,
+        "end": 58043,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58044,
+        "end": 58143,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58144,
+        "end": 58243,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58244,
+        "end": 58343,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58344,
+        "end": 58443,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58444,
+        "end": 58543,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 50000,
+        "end": 50059,
+        "administered": true
+      },
+      {
+        "family": 6,
+        "start": 57354,
+        "end": 57453,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57472,
+        "end": 57571,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57644,
+        "end": 57743,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57744,
+        "end": 57843,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57844,
+        "end": 57943,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57944,
+        "end": 58043,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58044,
+        "end": 58143,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58144,
+        "end": 58243,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58244,
+        "end": 58343,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58344,
+        "end": 58443,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58444,
+        "end": 58543,
+        "administered": false
+      }
+    ],
+    "matches": [],
+    "families": {
+      "ipv4": {
+        "status": "ok"
+      },
+      "ipv6": {
+        "status": "ok"
+      }
+    }
+  },
+  "assessment": {
+    "verdict": "OK",
+    "summary": "Windows owns this port with 1 listener.",
+    "confidence": "medium",
+    "findings": [
+      {
+        "severity": "low",
+        "code": "PARTIAL_INSPECTION",
+        "message": "Owner found, but could not inspect: docker."
+      },
+      {
+        "severity": "low",
+        "code": "PARTIAL_PROBES",
+        "message": "An owner was found, but one or more endpoint probes could not run. Unchecked endpoints have unknown reachability."
+      }
+    ]
+  },
+  "nextActions": [
+    {
+      "source": "windows",
+      "code": "VERIFY_WINDOWS_PROCESS",
+      "command": "Get-Process -Id 37180"
+    }
+  ]
+}

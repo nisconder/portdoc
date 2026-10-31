@@ -1,0 +1,9 @@
+{
+  "address": "127.0.0.1",
+  "family": 4,
+  "port": 61421,
+  "status": "unreachable",
+  "reachable": false,
+  "reason": "ECONNREFUSED",
+  "elapsedMs": 1
+}

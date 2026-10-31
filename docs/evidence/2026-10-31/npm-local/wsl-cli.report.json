@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 3,
+  "kind": "diagnosis",
+  "checkedAt": "2026-10-31T08:32:50.497Z",
+  "port": 42745,
+  "protocol": "tcp",
+  "target": "127.0.0.1",
+  "sources": {
+    "windows": {
+      "status": "ok",
+      "listeners": []
+    },
+    "wsl": {
+      "status": "ok",
+      "distro": "Ubuntu",
+      "listeners": [
+        {
+          "address": "127.0.0.1",
+          "port": 42745,
+          "state": "LISTEN",
+          "pid": 484,
+          "process": "python3",
+          "commandLine": "python3 -u -c 'import socket,time,os,json,sys s=socket.socket(socket.AF_INET,socket.SOCK_STREAM) s.bind(('\"'\"'127.0.0.1'\"'\"',0));s.listen();s.settimeout(0.5) print('\"'\"'PORTDOC_VALIDATION_READY='\"'\"'+json.dumps(dict(pid=os.getpid(),port=s.getsockname()[1],token=[REDACTED] end=time.monotonic()+90 while time.monotonic()<end:  try:   c,a=s.accept();c.close()  except socket.timeout: pass s.close()' portdoc-live-3b8b8b13-a119-4649-9e08-5e414e5e6f1b",
+          "cwd": "/mnt/d/New!!!/wsl-port-doctor",
+          "projectPath": "/mnt/d/New!!!/wsl-port-doctor",
+          "identitySource": "proc",
+          "path": "/usr/bin/python3.13"
+        }
+      ]
+    },
+    "docker": {
+      "status": "unavailable",
+      "executable": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe",
+      "endpoint": null,
+      "mappings": [],
+      "reason": "Docker Desktop is installed, but its local engine is not running or cannot be accessed through docker_engine or dockerDesktopLinuxEngine. Start Docker Desktop and retry. Remote contexts are not inspected."
+    }
+  },
+  "probes": {
+    "windows": {
+      "address": "127.0.0.1",
+      "family": 4,
+      "latencyMs": 8,
+      "status": "ok",
+      "reachable": false,
+      "reason": "ECONNREFUSED"
+    },
+    "wsl": {
+      "address": "127.0.0.1",
+      "family": 4,
+      "status": "ok",
+      "reachable": true,
+      "latencyMs": 2
+    }
+  },
+  "endpointMatrix": {
+    "windows": {
+      "localhost": {
+        "address": "::1",
+        "family": 6,
+        "latencyMs": 12,
+        "status": "error",
+        "reachable": null,
+        "reason": "EACCES"
+      },
+      "ipv4": {
+        "address": "127.0.0.1",
+        "family": 4,
+        "latencyMs": 8,
+        "status": "ok",
+        "reachable": false,
+        "reason": "ECONNREFUSED"
+      },
+      "ipv6": {
+        "address": "::1",
+        "family": 6,
+        "latencyMs": 8,
+        "status": "error",
+        "reachable": null,
+        "reason": "EACCES"
+      }
+    },
+    "wsl": {
+      "localhost": {
+        "address": "127.0.0.1",
+        "family": 4,
+        "status": "ok",
+        "reachable": true,
+        "latencyMs": 2
+      },
+      "ipv4": {
+        "address": "127.0.0.1",
+        "family": 4,
+        "status": "ok",
+        "reachable": true,
+        "latencyMs": 2
+      },
+      "ipv6": {
+        "address": "::1",
+        "family": 6,
+        "status": "ok",
+        "reachable": false,
+        "reason": "ECONNREFUSED",
+        "latencyMs": 1
+      }
+    }
+  },
+  "reservations": {
+    "status": "ok",
+    "ranges": [
+      {
+        "family": 4,
+        "start": 50000,
+        "end": 50059,
+        "administered": true
+      },
+      {
+        "family": 4,
+        "start": 57354,
+        "end": 57453,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57472,
+        "end": 57571,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57644,
+        "end": 57743,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57744,
+        "end": 57843,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57844,
+        "end": 57943,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 57944,
+        "end": 58043,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58044,
+        "end": 58143,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58144,
+        "end": 58243,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58244,
+        "end": 58343,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58344,
+        "end": 58443,
+        "administered": false
+      },
+      {
+        "family": 4,
+        "start": 58444,
+        "end": 58543,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 50000,
+        "end": 50059,
+        "administered": true
+      },
+      {
+        "family": 6,
+        "start": 57354,
+        "end": 57453,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57472,
+        "end": 57571,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57644,
+        "end": 57743,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57744,
+        "end": 57843,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57844,
+        "end": 57943,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 57944,
+        "end": 58043,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58044,
+        "end": 58143,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58144,
+        "end": 58243,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58244,
+        "end": 58343,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58344,
+        "end": 58443,
+        "administered": false
+      },
+      {
+        "family": 6,
+        "start": 58444,
+        "end": 58543,
+        "administered": false
+      }
+    ],
+    "matches": [],
+    "families": {
+      "ipv4": {
+        "status": "ok"
+      },
+      "ipv6": {
+        "status": "ok"
+      }
+    }
+  },
+  "assessment": {
+    "verdict": "UNKNOWN",
+    "summary": "A WSL listener exists, but the corresponding Windows loopback probes did not connect; review bindings and forwarding.",
+    "confidence": "medium",
+    "findings": [
+      {
+        "severity": "low",
+        "code": "ENDPOINT_FAMILY_MISMATCH",
+        "side": "wsl",
+        "message": "WSL: IPv4 and IPv6 loopback reachability differ. This can be an intentional service binding; use the endpoint matrix to choose a working address."
+      },
+      {
+        "severity": "medium",
+        "code": "WSL_NOT_REACHABLE_FROM_WINDOWS",
+        "message": "WSL reports a listener, but its corresponding Windows loopback probes did not connect. Check service bindings and forwarding; the TCP results do not identify the cause."
+      }
+    ]
+  },
+  "nextActions": [
+    {
+      "source": "wsl",
+      "code": "VERIFY_WSL_PROCESS",
+      "command": "wsl -d 'Ubuntu' -- ps -p 484 -o pid,comm,args"
+    }
+  ]
+}

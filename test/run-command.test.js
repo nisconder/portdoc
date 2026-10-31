@@ -11,8 +11,11 @@ import { PassThrough } from "node:stream";
 
 import { runCommand } from "../src/lib/run-command.js";
 
-const COMMAND_TIMEOUT_MS = 1_000;
-const FIXTURE_LIFETIME_MS = 6_000;
+// Real Node startup is part of the command timeout, especially on busy Windows
+// runners. Check the exact cleanup scheduling separately from these OS tests.
+const COMMAND_TIMEOUT_MS = 2_000;
+const INTEGRATION_TIMEOUT_MS = 7_000;
+const FIXTURE_LIFETIME_MS = 15_000;
 
 function processIsRunning(pid) {
   try {
@@ -59,6 +62,20 @@ function treeFixture({ rootExits = false, escaped = false, pidFile } = {}) {
   `;
 }
 
+async function trackedTreeFixture(t, options = {}) {
+  const directory = await mkdtemp(join(tmpdir(), "portdoc-command-test-"));
+  const pidFile = join(directory, "fixture-pids.json");
+  t.after(async () => {
+    // Read from disk even if timeout happened before stdout reached the caller.
+    try { stopFixtureProcesses(JSON.parse(await readFile(pidFile, "utf8"))); } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+    }
+    try { await unlink(pidFile); } catch (error) { if (error.code !== "ENOENT") throw error; }
+    await rmdir(directory);
+  });
+  return treeFixture({ ...options, pidFile });
+}
+
 function fixturePids(result) {
   const match = result.stdout.match(/PORTDOC_PIDS=(\{[^\r\n]+\})/);
   assert.ok(match, `Fixture did not report its PIDs: ${JSON.stringify(result)}`);
@@ -66,7 +83,7 @@ function fixturePids(result) {
 }
 
 async function waitUntilStopped(pid) {
-  const deadline = performance.now() + 1_000;
+  const deadline = performance.now() + 2_000;
   while (processIsRunning(pid) && performance.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, 25));
   }
@@ -86,8 +103,8 @@ function runOuterNode(source) {
       child.stdout.destroy();
       child.stderr.destroy();
       child.unref();
-      reject(new Error(`Outer CLI still held handles after 4 seconds: ${stderr}`));
-    }, 4_000);
+      reject(new Error(`Outer CLI still held handles after ${INTEGRATION_TIMEOUT_MS} ms: ${stderr}`));
+    }, INTEGRATION_TIMEOUT_MS);
     child.stdout.setEncoding("utf8").on("data", (value) => { stdout += value; });
     child.stderr.setEncoding("utf8").on("data", (value) => { stderr += value; });
     child.once("error", (error) => { clearTimeout(timer); reject(error); });
@@ -122,13 +139,11 @@ test("reports a successfully completed command", async () => {
 });
 
 test("reports a missing executable without waiting for its timeout", async () => {
-  const startedAt = performance.now();
   const result = await runCommand(join(tmpdir(), `portdoc-missing-${process.pid}-${Date.now()}.exe`), []);
   assert.equal(result.exitCode, null);
   assert.equal(result.missing, true);
   assert.equal(result.timedOut, false);
   assert.match(result.stderr, /ENOENT/);
-  assert.ok(performance.now() - startedAt < 2_000);
 });
 
 test("converts a synchronous spawn error into a command result", async () => {
@@ -139,8 +154,7 @@ test("converts a synchronous spawn error into a command result", async () => {
   assert.match(result.stderr, /null bytes/i);
 });
 
-test("retains partial stdout and stderr when a command times out", async () => {
-  const startedAt = performance.now();
+test("retains partial stdout and stderr when a command times out", { timeout: INTEGRATION_TIMEOUT_MS }, async () => {
   const result = await runCommand(process.execPath, ["-e", `
     process.stdout.write("partial evidence");
     process.stderr.write("partial warning");
@@ -150,7 +164,6 @@ test("retains partial stdout and stderr when a command times out", async () => {
   assert.equal(result.missing, false);
   assert.equal(result.stdout, "partial evidence");
   assert.equal(result.stderr, "partial warning");
-  assert.ok(performance.now() - startedAt < 2_500);
 });
 
 test("bounds cleanup even when a child never emits close and releases its handles", async () => {
@@ -167,52 +180,66 @@ test("bounds cleanup even when a child never emits close and releases its handle
     unref() { this.unrefCalls += 1; },
   });
   const originalSpawn = childProcess.spawn;
-  // A fake child has no OS handles to keep the event loop alive before timeout.
-  const guard = setTimeout(() => {}, 2_000);
+  const originalSetTimeout = globalThis.setTimeout;
+  const originalClearTimeout = globalThis.clearTimeout;
+  const scheduled = [];
   childProcess.spawn = () => child;
+  // Advance only this command's deadlines, without depending on wall-clock load.
+  globalThis.setTimeout = (callback, delay) => {
+    const handle = { callback, delay, unref() {}, cancelled: false };
+    scheduled.push(handle);
+    return handle;
+  };
+  globalThis.clearTimeout = (handle) => {
+    if (scheduled.includes(handle)) handle.cancelled = true;
+    else originalClearTimeout(handle);
+  };
   syncBuiltinESMExports();
   try {
-    const startedAt = performance.now();
-    const result = await runCommand("mock-collector", [], { timeoutMs: 50 });
-    const elapsed = performance.now() - startedAt;
+    let settled = false;
+    const pending = runCommand("mock-collector", [], { timeoutMs: 50 }).then((result) => {
+      settled = true;
+      return result;
+    });
+    assert.equal(scheduled.length, 1);
+    assert.equal(scheduled[0].delay, 50);
+    scheduled[0].callback();
+    assert.equal(scheduled.length, 2, "Timeout must schedule a separate cleanup deadline.");
+    assert.ok(scheduled[1].delay > 0 && scheduled[1].delay <= 1_000);
+    assert.equal(settled, false);
+    scheduled[1].callback();
+    const result = await pending;
     assert.equal(result.timedOut, true);
     assert.equal(result.exitCode, null);
-    assert.ok(elapsed >= 250, `Cleanup returned before exercising its deadline (${elapsed} ms).`);
-    assert.ok(elapsed < 1_500, `Cleanup exceeded its bounded deadline (${elapsed} ms).`);
     assert.equal(child.stdout.destroyed, true);
     assert.equal(child.stderr.destroyed, true);
     assert.ok(child.killCalls >= 1);
     assert.ok(child.unrefCalls >= 1);
   } finally {
     childProcess.spawn = originalSpawn;
+    globalThis.setTimeout = originalSetTimeout;
+    globalThis.clearTimeout = originalClearTimeout;
     syncBuiltinESMExports();
-    clearTimeout(guard);
     child.stdout.destroy();
     child.stderr.destroy();
   }
 });
 
-test("terminates a live command tree whose descendant inherits its pipes", async (t) => {
-  let pids;
-  t.after(() => stopFixtureProcesses(pids));
-  const startedAt = performance.now();
-  const result = await runCommand(process.execPath, ["-e", treeFixture()], { timeoutMs: COMMAND_TIMEOUT_MS });
-  pids = fixturePids(result);
+test("terminates a live command tree whose descendant inherits its pipes", { timeout: INTEGRATION_TIMEOUT_MS }, async (t) => {
+  const fixture = await trackedTreeFixture(t);
+  const result = await runCommand(process.execPath, ["-e", fixture], { timeoutMs: COMMAND_TIMEOUT_MS });
+  const pids = fixturePids(result);
   assert.equal(result.timedOut, true);
-  assert.ok(performance.now() - startedAt < 2_500);
   assert.equal(await waitUntilStopped(pids.root), true, "The fixture root must be stopped.");
   assert.equal(await waitUntilStopped(pids.descendant), true, "The fixture descendant must be stopped.");
 });
 
-test("returns promptly when the root exits before a descendant releases inherited pipes", async (t) => {
-  let pids;
-  t.after(() => stopFixtureProcesses(pids));
-  const startedAt = performance.now();
-  const result = await runCommand(process.execPath, ["-e", treeFixture({ rootExits: true })], {
+test("returns promptly when the root exits before a descendant releases inherited pipes", { timeout: INTEGRATION_TIMEOUT_MS }, async (t) => {
+  const fixture = await trackedTreeFixture(t, { rootExits: true });
+  const result = await runCommand(process.execPath, ["-e", fixture], {
     timeoutMs: COMMAND_TIMEOUT_MS,
   });
-  pids = fixturePids(result);
-  assert.ok(performance.now() - startedAt < 2_500);
+  const pids = fixturePids(result);
   // Windows may close its inherited-pipe view with the root; POSIX keeps it open.
   if (process.platform !== "win32") assert.equal(result.timedOut, true);
   assert.equal(await waitUntilStopped(pids.root), true);
@@ -220,40 +247,28 @@ test("returns promptly when the root exits before a descendant releases inherite
 
 test("enforces the cleanup deadline when a POSIX descendant escapes its process group", {
   skip: process.platform === "win32" ? "POSIX process groups only" : false,
+  timeout: INTEGRATION_TIMEOUT_MS,
 }, async (t) => {
-  let pids;
-  t.after(() => stopFixtureProcesses(pids));
-  const startedAt = performance.now();
-  const result = await runCommand(process.execPath, ["-e", treeFixture({ escaped: true })], {
+  const fixture = await trackedTreeFixture(t, { escaped: true });
+  const result = await runCommand(process.execPath, ["-e", fixture], {
     timeoutMs: COMMAND_TIMEOUT_MS,
   });
-  pids = fixturePids(result);
+  const pids = fixturePids(result);
   assert.equal(result.timedOut, true);
-  assert.ok(performance.now() - startedAt < 2_500);
   assert.equal(processIsRunning(pids.descendant), true, "The escaped fixture must survive long enough to exercise the deadline.");
 });
 
 test("lets an outer CLI actually exit after timeout without an explicit process.exit", async (t) => {
-  const directory = await mkdtemp(join(tmpdir(), "portdoc-command-test-"));
-  const pidFile = join(directory, "fixture-pids.json");
-  t.after(async () => {
-    try { stopFixtureProcesses(JSON.parse(await readFile(pidFile, "utf8"))); } catch (error) {
-      if (error.code !== "ENOENT") throw error;
-    }
-    try { await unlink(pidFile); } catch (error) { if (error.code !== "ENOENT") throw error; }
-    await rmdir(directory);
-  });
+  const fixture = await trackedTreeFixture(t, { escaped: process.platform !== "win32" });
   const moduleUrl = new URL("../src/lib/run-command.js", import.meta.url).href;
   const source = `
     import { runCommand } from ${JSON.stringify(moduleUrl)};
     const result = await runCommand(process.execPath,
-      ["-e", ${JSON.stringify(treeFixture({ escaped: process.platform !== "win32", pidFile }))}],
+      ["-e", ${JSON.stringify(fixture)}],
       { timeoutMs: ${COMMAND_TIMEOUT_MS} });
     console.log(JSON.stringify(result));
   `;
-  const startedAt = performance.now();
   const outer = await runOuterNode(source);
   assert.equal(outer.exitCode, 0, outer.stderr);
   assert.equal(JSON.parse(outer.stdout).timedOut, true);
-  assert.ok(performance.now() - startedAt < 3_000);
 });

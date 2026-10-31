@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.7.1
 
 - Bound collector timeout cleanup to an additional 250 ms, closing pipes and unreferencing process handles at the deadline.
 - Attempt Windows process-tree termination and POSIX process-group termination before falling back to direct-child cleanup.
 - Add real subprocess timeout regression coverage and a real-environment validation checklist.
+- Test command cleanup on Windows and Linux, and include the source commit in standalone build metadata when Git is available.
 
 ## 0.7.0
 
