@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-31T08:36:30.244Z",
+  "releaseTag": "v0.7.1",
+  "releaseSourceCommit": "247f3fe43b73eaaf1731517a43b094d8b89ab7c4",
+  "metadata": {
+    "package": "portdoc",
+    "version": "0.7.1",
+    "sourceCommit": "247f3fe43b73eaaf1731517a43b094d8b89ab7c4",
+    "runtime": "Node.js 26.12.1",
+    "runtimeUrl": "https://nodejs.org/dist/v26.12.1/win-x64/node.exe",
+    "runtimeSha256": "1c63f1417e2e26d83ca9a9ec1d548524ab1305bc7209d90ebca56257ff0d84ed",
+    "signature": "unsigned",
+    "sourceModules": 19
+  },
+  "files": [
+    {
+      "file": "portdoc-win-x64.exe",
+      "expectedSha256": "63019c6cc7a2aef031d4c9a541454c581e1883f3e5846368bfea4d27627e6c03",
+      "actualSha256": "63019c6cc7a2aef031d4c9a541454c581e1883f3e5846368bfea4d27627e6c03",
+      "matches": true
+    },
+    {
+      "file": "portdoc-win-x64.zip",
+      "expectedSha256": "d752e9fe037a514e9d90db9a7391f3b692aa32d08c509a5606335f9bf5e45924",
+      "actualSha256": "d752e9fe037a514e9d90db9a7391f3b692aa32d08c509a5606335f9bf5e45924",
+      "matches": true
+    }
+  ],
+  "zipExecutableSha256": "63019c6cc7a2aef031d4c9a541454c581e1883f3e5846368bfea4d27627e6c03",
+  "zipExecutableMatchesStandalone": true,
+  "pass": true
+}

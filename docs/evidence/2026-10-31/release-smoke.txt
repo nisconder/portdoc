@@ -1,0 +1,1 @@
+EXE smoke checks passed: version 0.7.1, bare/help, en/zh-CN, diagnosis/demo v3, scan, doctor, errors, JSON; isolated cwd and no Node/npm on PATH.

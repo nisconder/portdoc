@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-31T08:34:13.597Z",
+  "source": "npm official registry",
+  "name": "portdoc",
+  "version": "0.7.0",
+  "gitHead": "dc7de08141eb20f1a20765ec829ee96b59fb5852",
+  "tarballUrl": "https://registry.npmjs.org/portdoc/-/portdoc-0.7.0.tgz",
+  "expectedIntegrity": "sha512-g83ZAHpcZVOhqVt7neYYHE6fWEHb7peTPZQls5AMFulqu2U2O8Rg8jmfB4lXTkcOXbQjTq/YuYj+hHSRAD91Xg==",
+  "actualIntegrity": "sha512-g83ZAHpcZVOhqVt7neYYHE6fWEHb7peTPZQls5AMFulqu2U2O8Rg8jmfB4lXTkcOXbQjTq/YuYj+hHSRAD91Xg==",
+  "integrityMatches": true,
+  "commandRunnerSha256": "f0740ba6cdeb161f796b807d96be8a6e448fa9b965a2628c108aa8f43b976dc8",
+  "containsCleanupDeadline": false,
+  "containsTreeTermination": false,
+  "packageVersion": "0.7.0"
+}

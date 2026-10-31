@@ -30,4 +30,14 @@ node scripts/validate-live.mjs --out .build/validation-new --entry .build/verifi
 
 本次未证明：Windows IPv6 正常可用时的拒绝/成功行为；Windows 无法访问 WSL 的变体；真实 Docker 发布重叠；已有 Windows 排除端口的完整案例；其他发行版、WSL 网络模式、权限和系统组合。不能据此宣称所有环境均正确。
 
-GitHub Release 产物的下载、校验和复测记录将在发布核验完成后补充；本地候选包通过不等于远端分发产物已核验。
+## GitHub 分发产物核验
+
+`v0.7.1` 标签指向 `247f3fe43b73eaaf1731517a43b094d8b89ab7c4`。[双系统 CI](https://github.com/nisconder/portdoc/actions/runs/41185076398)的 Windows／Ubuntu Node 20、22、24 六个测试任务及 CI EXE 构建均通过；[正式发布构建](https://github.com/nisconder/portdoc/actions/runs/41185101503)的 build 与 upload 也通过，发布 workflow 独立核对 tag／package／CLI 版本及构建源码提交。
+
+从该 Release 的资产下载 EXE、ZIP、SHA256SUMS 和 build-info 后：[校验摘要](evidence/2026-10-31/release-verification.json)确认两个分发文件的 SHA-256 均匹配，ZIP 内 `portdoc.exe` 与独立 EXE 完全相同，build-info 的版本为 `0.7.1` 且 sourceCommit 等于标签提交。EXE 的 SHA-256 为 `63019c6cc7a2aef031d4c9a541454c581e1883f3e5846368bfea4d27627e6c03`；ZIP 为 `d752e9fe037a514e9d90db9a7391f3b692aa32d08c509a5606335f9bf5e45924`。
+
+[下载版 EXE 冒烟输出](evidence/2026-10-31/release-smoke.txt)确认在隔离目录、PATH 不含 Node/npm 的情况下，版本、中英文帮助、诊断/demo v3、scan、doctor、错误和 JSON 均通过。随后以 `--entry <下载版EXE>` 重跑同一脚本；本机保存的 manifest 入口 SHA-256 与下载版 EXE 相同。三项实际对照没有失败检查：缺失 Docker 案例通过，IPv4 与 WSL 案例均因独立确认的 Windows IPv6 EACCES 保留为 `environment-limited`，整体仍是 `incomplete`，不是全部兼容性验证完成。
+
+下载版 EXE 的完整命令原始字节、解码输出、时序及三份报告均保留在维护者本机的验证归档中，未额外上传到 Release 或仓库。按本次明确选择，Release 只公开 EXE、ZIP、SHA256SUMS、运行时许可证和 build-info 五项标准资产；本地候选 npm tarball 也未作为 GitHub 资产公开。
+
+[npm 官方分发核对](evidence/2026-10-31/npm-local/registry-version-verification.json)还下载了当时的 registry latest `0.7.0` 并验证其 SHA-512 integrity；归档中的命令执行器确实没有本次 cleanup deadline／process-tree 修复。GitHub 0.7.1 发布不能替代 npm 发布；本轮没有修改 npm dist-tag，也没有声称 `npm install portdoc@latest` 会得到 0.7.1。
