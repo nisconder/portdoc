@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "snapshot.schema.json",
+  "title": "portdoc snapshot v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "context", "report"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "snapshot" },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hostname", "platform", "requestedDistro"],
+      "properties": {
+        "hostname": { "type": "string", "minLength": 1 },
+        "platform": { "type": "string", "minLength": 1 },
+        "requestedDistro": { "type": ["string", "null"] }
+      }
+    },
+    "report": { "oneOf": [{ "$ref": "scan.schema.json" }, { "$ref": "report.schema.json" }] }
+  }
+}

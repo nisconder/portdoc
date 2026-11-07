@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "diff.schema.json",
+  "title": "portdoc evidence diff v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "reportKind", "before", "after", "sample", "complete", "changed", "changes", "unknown", "notes"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "diff" },
+    "reportKind": { "enum": ["scan", "diagnosis"] },
+    "before": { "$ref": "#/$defs/metadata" },
+    "after": { "$ref": "#/$defs/metadata" },
+    "sample": { "type": "boolean" },
+    "complete": { "type": "boolean" },
+    "changed": { "type": "boolean" },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["category", "source", "identity", "field", "before", "after"],
+        "properties": {
+          "category": { "enum": ["context", "evidence", "identity-evidence", "listener-added", "listener-removed", "listener-changed", "mapping-added", "mapping-removed", "mapping-changed", "endpoint", "reservation"] },
+          "source": { "type": "string" },
+          "identity": { "type": ["string", "null"] },
+          "field": { "type": ["string", "null"] },
+          "before": {},
+          "after": {}
+        }
+      }
+    },
+    "unknown": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "reason", "beforeStatus", "afterStatus"],
+        "properties": {
+          "source": { "type": "string" },
+          "reason": { "enum": ["SOURCE_CONTEXT_CHANGED", "SOURCE_CONTEXT_UNVERIFIED", "SOURCE_INCOMPLETE", "IDENTITY_INCOMPLETE", "PROBE_INCOMPLETE", "RESERVATIONS_INCOMPLETE"] },
+          "beforeStatus": { "type": ["string", "null"] },
+          "afterStatus": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkedAt", "port"],
+      "properties": {
+        "checkedAt": { "type": "string", "format": "date-time" },
+        "port": { "type": ["integer", "null"], "minimum": 1, "maximum": 65535 }
+      }
+    }
+  }
+}

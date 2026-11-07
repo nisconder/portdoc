@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { copyFile, mkdtemp, readFile, rmdir, unlink } from "node:fs/promises";
+import { copyFile, mkdtemp, readFile, rmdir, unlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,6 +11,9 @@ const builtExecutable = path.resolve(process.argv[2] ?? path.join(root, "dist", 
 const { version } = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const isolated = await mkdtemp(path.join(os.tmpdir(), "portdoc-exe-smoke-"));
 const executable = path.join(isolated, "portdoc.exe");
+const snapshotFile = path.join(isolated, "snapshot.json");
+const diffBeforeFile = path.join(isolated, "diff-before.json");
+const diffAfterFile = path.join(isolated, "diff-after.json");
 await copyFile(builtExecutable, executable);
 // Exclude installed Node/npm and the checkout from PATH. Windows utilities
 // remain available for collector diagnostics.
@@ -49,6 +52,23 @@ assert.ok(demoReport.endpointMatrix.windows);
 assert.ok(demoReport.endpointMatrix.wsl);
 assert.ok(demoReport.reservations);
 assert.ok(Array.isArray(demoReport.nextActions));
+await writeFile(diffBeforeFile, JSON.stringify(demoReport));
+const changedDemo = structuredClone(demoReport);
+changedDemo.sources.windows.listeners[0].pid += 1;
+await writeFile(diffAfterFile, JSON.stringify(changedDemo));
+const diff = invoke(["diff", diffBeforeFile, diffAfterFile, "--json"]);
+assert.equal(diff.status, 1);
+assert.equal(JSON.parse(diff.stdout).changes[0].field, "pid");
+assert.equal(invoke(["diff", diffBeforeFile, diffBeforeFile]).status, 0);
+const snapshot = invoke(["snapshot", "--out", snapshotFile, "--json", "--timeout", "1000"]);
+assert.ok([0, 2].includes(snapshot.status));
+const savedSnapshot = JSON.parse(await readFile(snapshotFile, "utf8"));
+assert.equal(savedSnapshot.kind, "snapshot");
+assert.equal(savedSnapshot.report.kind, "scan");
+assert.deepEqual(JSON.parse(snapshot.stdout), savedSnapshot);
+const overwrite = invoke(["snapshot", "--out", snapshotFile, "--timeout", "1000"]);
+assert.equal(overwrite.status, 2);
+assert.match(overwrite.stderr, /already exists/);
 const scan = invoke(["scan", "--json", "--limit", "2", "--timeout", "1000"]);
 assert.ok([0, 1, 2].includes(scan.status));
 const scanReport = JSON.parse(scan.stdout);
@@ -101,9 +121,10 @@ assert.equal(report.probes.windows.status, "skipped");
 } finally {
   const deadline = Date.now() + 3_000;
   await cleanupTemporary(() => unlink(executable), executable, deadline);
+  for (const file of [snapshotFile, diffBeforeFile, diffAfterFile]) await cleanupTemporary(() => unlink(file), file, deadline);
   await cleanupTemporary(() => rmdir(isolated), isolated, deadline);
 }
-console.log(`EXE smoke checks passed: version ${version}, bare/help, en/zh-CN, diagnosis/demo v3, scan, doctor, errors, JSON; isolated cwd and no Node/npm on PATH.`);
+console.log(`EXE smoke checks passed: version ${version}, bare/help, en/zh-CN, diagnosis/demo v3, scan, doctor, snapshot/diff, overwrite protection, errors, JSON; isolated cwd and no Node/npm on PATH.`);
 
 async function cleanupTemporary(remove, target, deadline) {
   let pauseMs = 100;
