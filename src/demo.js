@@ -37,7 +37,7 @@ export function createDemoReport() {
         }],
       },
       wsl: { status: "ok", distro: "Ubuntu", listeners: [] },
-      docker: { status: "ok", executable: "docker", mappings: [] },
+      docker: { status: "ok", executable: "docker", endpoint: "npipe:////./pipe/docker_engine", mappings: [] },
     },
     probes: { windows: windows.ipv4, wsl: wsl.ipv4 },
     endpointMatrix: { windows, wsl },

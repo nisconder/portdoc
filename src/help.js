@@ -1,6 +1,7 @@
 import { VERSION } from "./version.js";
 
 export function getHelpText(language, topic) {
+  if (topic === "snapshot" || topic === "diff") return snapshotHelp(language);
   if (topic === "scan") return scanHelp(language);
   if (topic === "doctor") return doctorHelp(language);
   if (topic === "demo") return language === "zh-CN"
@@ -134,6 +135,8 @@ USAGE
   portdoc <port> [options]
   portdoc scan [--issues-only]        Discover observed TCP ports
   portdoc doctor                     Check local collector availability
+  portdoc snapshot [port] --out <file> Save inventory or one-port evidence
+  portdoc diff <before> <after>       Compare saved evidence offline
   portdoc demo [--lang en|zh-CN]      Simulated example; no system checks
   portdoc help [--lang en|zh-CN]
   portdoc --version
@@ -224,6 +227,8 @@ function chineseHelp() {
   portdoc <端口> [选项]
   portdoc scan [--issues-only]        汇总已观察到的 TCP 端口
   portdoc doctor                     检查本机采集环境
+  portdoc snapshot [端口] --out <文件> 保存清单或单端口证据
+  portdoc diff <之前> <之后>          离线比较已保存的证据
   portdoc demo [--lang en|zh-CN]      模拟样例，不检查当前系统
   portdoc help [--lang en|zh-CN]
   portdoc --version
@@ -294,4 +299,70 @@ Windows 独立版
   .\\portdoc.cmd <端口>               检查指定端口
   .\\portdoc.cmd                      显示此帮助
   .\\portdoc-launcher.cmd             打开 Windows 交互启动器`;
+}
+
+function snapshotHelp(language) {
+  return language === "zh-CN" ? `portdoc snapshot / diff — 保存和对比本机端口证据
+
+用法
+  portdoc snapshot --out before.json
+  portdoc snapshot 5173 --out before.json [--distro Ubuntu] [--no-probe]
+  portdoc diff before.json after.json [--json] [--lang en|zh-CN]
+
+无端口时，每层枚举一次已观察到的监听和映射，不连接端口。
+指定端口时，保存标准诊断，包括 localhost、IPv4/IPv6 可达性与排除范围。
+snapshot 支持 --timeout、--distro、--docker-path、--json；必须提供新文件路径。
+不会覆盖已有文件。即使采集不完整，也会保存实际结果并返回 2。
+WSL 采集可能启动所选发行版；不会启动 Docker 或修改网络配置。
+
+diff 完全离线，支持 snapshot v1、原 scan v1 和 diagnosis v3 JSON。
+嵌入快照的原报告结构不变。显示截断不影响对完整 sources 数组的比较。
+要求报告类型、端口和已知主机一致；切换 WSL 发行版或 Docker 端点的来源
+标为无法比较。旧 JSON 没有主机信息，需自行确认来自同一台机器。
+采集失败不是服务消失；探测错误不是不可达；两次都禁用的探测明确列为跳过。
+快照含本机名称、路径与脱敏后的命令行，分享前检查内容。
+
+退出码
+  snapshot: 0 已保存且所选检查完整；2 已保存但不完整，或文件/参数错误
+  diff:     0 所选可比证据无变化；1 有变化；2 证据不完整或输入错误
+            2 的优先级高于 1，JSON 仍包含可比较的变化。
+
+示例
+  portdoc snapshot 5173 --out before.json --distro Ubuntu
+  # 完成你要观察的环境操作后，再运行：
+  portdoc snapshot 5173 --out after.json --distro Ubuntu
+  portdoc diff before.json after.json`
+    : `portdoc snapshot / diff — save and compare local port evidence
+
+USAGE
+  portdoc snapshot --out before.json
+  portdoc snapshot 5173 --out before.json [--distro Ubuntu] [--no-probe]
+  portdoc diff before.json after.json [--json] [--lang en|zh-CN]
+
+Without a port, inventory listeners and mappings once per layer; no connections.
+With a port, capture the standard diagnosis, including localhost, IPv4/IPv6
+reachability and excluded ranges. snapshot accepts --timeout, --distro,
+--docker-path and --json. --out must name a new file; existing files are never
+overwritten. Incomplete collection is still saved, with exit code 2.
+WSL queries may start the selected distribution; Docker is not started.
+
+diff is offline and accepts snapshot v1, original scan v1 and diagnosis v3 JSON.
+Snapshots embed unchanged reports. Display truncation does not truncate the
+complete sources arrays used for comparison. Types, ports and known hosts must
+match. A changed WSL distribution or Docker endpoint makes that source
+incomparable. For legacy JSON without host context, verify the host yourself.
+Collector failure is not service removal; a probe error is not unreachable.
+Probes disabled in both inputs are explicitly skipped.
+Snapshots contain hostnames, paths and redacted command lines; review before sharing.
+
+EXIT CODES
+  snapshot: 0 Saved, selected checks complete; 2 Saved but incomplete, or IO/usage error
+  diff:     0 Selected comparable evidence unchanged; 1 Changed; 2 Incomplete/invalid
+            2 takes precedence over 1; JSON still contains comparable changes.
+
+EXAMPLE
+  portdoc snapshot 5173 --out before.json --distro Ubuntu
+  # Perform the environment action you want to observe, then:
+  portdoc snapshot 5173 --out after.json --distro Ubuntu
+  portdoc diff before.json after.json`;
 }

@@ -129,6 +129,59 @@ Docker queries use the local `docker_engine` or `dockerDesktopLinuxEngine`
 named pipe. Remote `DOCKER_HOST` / Docker contexts are not mixed into local
 port reports; saved Docker configuration is unchanged.
 
+## Save and compare environment evidence
+
+```powershell
+portdoc snapshot --out before.json          # All observed listeners/mappings; no TCP probes
+# Perform the environment action you want to observe, then:
+portdoc snapshot --out after.json
+portdoc diff before.json after.json
+
+portdoc snapshot 5173 --out port-before.json --distro Ubuntu
+# After changing the service, capture the same port/distribution:
+portdoc snapshot 5173 --out port-after.json --distro Ubuntu
+portdoc diff port-before.json port-after.json --json
+```
+
+Without a port, snapshot inventories each layer once. With a port, it records
+the standard diagnosis, including localhost/IPv4/IPv6 reachability and Windows
+excluded ranges. It does not probe every discovered port. `--no-probe` is
+available for single-port snapshots. WSL collection may start the selected
+distribution, as with `scan` and a normal diagnosis.
+
+`--out` creates a new UTF-8 JSON file and refuses to overwrite an existing file.
+Incomplete evidence is still saved: snapshot exits **0** when the selected
+checks completed, or **2** when incomplete or unable to save. This describes
+capture completeness, not whether a port is healthy or conflicted. `--json`
+also prints the saved snapshot to stdout.
+
+Diff runs entirely offline. It compares listener identity/project metadata,
+container/Compose mappings, and (for single-port reports) reachability and
+excluded ranges. Timestamp, latency and array ordering are not environment
+changes. A failed collector or missing identity information is explicitly
+incomplete, never evidence that a listener vanished or a problem was fixed.
+Changing WSL distributions or Docker endpoints makes that source incomparable;
+missing or unknown source identities are also marked unverified.
+Probes disabled in both inputs are listed as skipped; they are not tested.
+
+Diff exits **0** for no observed changes in the selected comparable evidence,
+**1** for changes, or **2** for incomplete comparison or invalid input. Code 2
+takes precedence over 1; the output still includes changes that can be compared.
+Text shows the first 100 changes; `--json` includes all changes and unavailable
+comparisons. This is an observation diff, not a root-cause or repair verdict.
+
+[Snapshot v1](schema/snapshot.schema.json) embeds the unchanged scan v1 or
+diagnosis v3 report in `report`, plus host/distribution context. Diff also
+accepts existing `scan --json` and `<port> --json` files. Compare matching kinds
+and ports from the same host; snapshots reject known host mismatches, while
+legacy JSON cannot verify host identity. Diff uses full `sources` arrays even
+when scan's displayed `ports` list is truncated. The output contract is
+[diff v1](schema/diff.schema.json). Input files are limited to 32 MiB.
+
+Snapshots contain hostnames, local paths and redacted command lines. Review
+them before sharing. A reproducible live-check procedure and its limitations
+are in [snapshot validation](docs/snapshot-validation.md).
+
 ## Windows excluded ranges
 
 `portdoc 50000` also runs the read-only `netsh interface ipv4/ipv6 show

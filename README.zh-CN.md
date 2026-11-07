@@ -115,6 +115,49 @@ Docker 仅通过本机 `docker_engine` 或 `dockerDesktopLinuxEngine` named pipe
 只读验证命令会指向实际 PID、WSL 发行版、容器和命中范围。命令只展示，不会
 自动执行；窄终端折行时，可从 JSON `nextActions` 取得完整命令字符串。
 
+## 保存快照与比较变化
+
+```powershell
+portdoc snapshot --out before.json
+# 完成需要观察的环境操作后：
+portdoc snapshot --out after.json
+portdoc diff before.json after.json
+
+portdoc snapshot 5173 --out port-before.json --distro Ubuntu
+# 调整服务后，对同一端口与发行版再次采集：
+portdoc snapshot 5173 --out port-after.json --distro Ubuntu
+portdoc diff port-before.json port-after.json --json
+```
+
+不指定端口时，只枚举各层监听和映射，不发起连接；指定端口时保存完整诊断，
+包括 localhost、IPv4、IPv6 可达性及 Windows TCP 排除范围。不会对全部端口逐个
+探测；单端口快照支持 `--no-probe`。WSL 查询可能启动所选发行版。
+
+`--out` 必须是新文件路径，不覆盖已有文件。采集不完整仍保存真实结果。
+snapshot 退出码 **0** 表示已保存且所选检查完整，**2** 表示已保存但不完整，
+或参数/文件错误；它不表示端口健康程度。`--json` 会同时在标准输出显示快照。
+
+diff 完全离线，比较监听身份与项目路径、容器和 Compose 映射、单端口的
+可达性和排除范围。时间戳、探测耗时、数组顺序不作为环境变化。采集失败、
+身份信息缺失会明确标为证据不足，不会把它们当作监听消失或问题修复。
+切换 WSL 发行版或 Docker 端点后，对应来源标为无法比较；缺失或未知的来源身份
+也标为无法核实。两次都禁用的探测
+列为跳过，不代表已经验证可达性。
+
+diff 退出码：**0** 所选可比证据未发现变化；**1** 有变化；**2** 证据不完整
+或输入错误。2 优先于 1，但仍输出能够比较的变化。文本最多显示前 100 项，
+`--json` 包含全部变化与无法比较项。观察变化不等于确认根因或修复结果。
+
+[snapshot v1](schema/snapshot.schema.json) 在 `report` 内保存原样的 scan v1 或
+diagnosis v3 报告，附带主机和发行版上下文。diff 也接受原有 `scan --json`、
+`<端口> --json` 输出，但旧 JSON 不含主机上下文，需要自行确认来自同一机器。
+两份输入必须类型和端口一致；已知主机不一致会拒绝比较。清单的显示截断不影响
+对完整 `sources` 数组的比较。输入上限 32 MiB，输出契约为
+[diff v1](schema/diff.schema.json)。
+
+快照包含本机名称、本地路径和脱敏后的命令行，分享前应检查内容。
+可复现的真实机器验证步骤及限制见 [snapshot validation](docs/snapshot-validation.md)。
+
 ## 结果边界
 
 | 结果 | 退出码 | 含义 |

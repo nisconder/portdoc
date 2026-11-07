@@ -6,6 +6,8 @@ import { doctor } from "./doctor.js";
 import { getHelpText } from "./help.js";
 import { createMessages, normalizeLanguage, resolveLanguage } from "./i18n.js";
 import { VERSION } from "./version.js";
+import { captureSnapshot, readSnapshot, saveSnapshot } from "./snapshot.js";
+import { compareSnapshots, diffExitCode, formatDiff } from "./diff.js";
 
 export async function main(argv, dependencies = {}) {
   const requestedLanguage = findRequestedLanguage(argv);
@@ -30,6 +32,10 @@ export async function main(argv, dependencies = {}) {
   if (options.version) {
     (dependencies.stdout ?? console.log)(VERSION);
     return 0;
+  }
+
+  if (options.command === "snapshot" || options.command === "diff") {
+    return snapshotCommand(options, dependencies, language);
   }
 
   const report = options.command === "scan"
@@ -76,17 +82,32 @@ export function parseArgs(argv) {
     else if (value === "--distro" || value === "-d") options.distro = requireValue(argv, ++index, value);
     else if (value === "--docker-path") options.dockerPath = requireValue(argv, ++index, value);
     else if (value === "--timeout") options.timeoutMs = parseTimeout(requireValue(argv, ++index, value));
+    else if (value === "--out") options.out = requireValue(argv, ++index, value);
+    else if (value.startsWith("--out=")) options.out = requireValue([value.slice("--out=".length)], 0, "--out");
     else if (value.startsWith("-")) throw new Error(`Unknown option: ${value}`);
     else positional.push(value);
   }
 
   if (options.help) {
-    const topic = positional.find((value) => ["scan", "doctor", "demo"].includes(value));
+    const topic = positional.find((value) => ["scan", "doctor", "demo", "snapshot", "diff"].includes(value));
     return topic ? { ...options, helpTopic: topic } : options;
   }
   if (options.version) return options;
   if (options.limit !== undefined || options.issuesOnly !== undefined) {
     if (positional.length !== 1 || positional[0] !== "scan") throw new Error("--limit and --issues-only require the scan command.");
+  }
+  if (positional[0] === "snapshot") {
+    if (!options.out || positional.length > 2) throw new Error("Use snapshot [port] --out <new-file.json>.");
+    if (positional.length === 1 && options.probe === false) throw new Error("Snapshot inventory does not probe; --no-probe requires a port.");
+    return { ...options, command: "snapshot", ...(positional.length === 2 ? { port: parsePort(positional[1]) } : {}) };
+  }
+  if (options.out !== undefined) throw new Error("--out requires the snapshot command.");
+  if (positional[0] === "diff") {
+    if (positional.length !== 3) throw new Error("Use diff <before.json> <after.json>.");
+    if (options.distro || options.dockerPath || options.probe === false || argv.includes("--timeout")) {
+      throw new Error("diff reads files offline; collector options are not supported.");
+    }
+    return { ...options, command: "diff", before: positional[1], after: positional[2] };
   }
   if (positional.length === 1 && ["scan", "doctor"].includes(positional[0])) {
     if (positional[0] === "doctor" && (options.distro || options.probe === false)) throw new Error("doctor checks the Windows host, not a selected distribution or port.");
@@ -94,12 +115,43 @@ export function parseArgs(argv) {
   }
   if (positional.length === 1 && positional[0] === "demo") return { ...options, demo: true };
   if (positional.length !== 1) throw new Error("Provide exactly one TCP port number.");
-  const port = Number(positional[0]);
-  if (!Number.isInteger(port) || port < 1 || port > 65_535) {
-    throw new Error(`Invalid TCP port: ${positional[0]}`);
-  }
-  options.port = port;
+  options.port = parsePort(positional[0]);
   return options;
+}
+
+function parsePort(value) {
+  const port = Number(value);
+  if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+    throw new Error(`Invalid TCP port: ${value}`);
+  }
+  return port;
+}
+
+async function snapshotCommand(options, dependencies, language) {
+  const stdout = dependencies.stdout ?? console.log;
+  const stderr = dependencies.stderr ?? console.error;
+  try {
+    if (options.command === "snapshot") {
+      const snapshot = await captureSnapshot(options, dependencies);
+      await (dependencies.saveSnapshot ?? saveSnapshot)(options.out, snapshot);
+      const comparison = compareSnapshots(snapshot, snapshot);
+      stdout(options.json ? JSON.stringify(snapshot, null, 2) : language === "zh-CN"
+        ? `快照已保存到 ${JSON.stringify(options.out)}（${comparison.complete ? "所选检查完整" : "证据不完整，仍已保存"}）。\n对比：portdoc diff before.json after.json`
+        : `Snapshot saved to ${JSON.stringify(options.out)} (${comparison.complete ? "selected checks complete" : "incomplete evidence; still saved"}).\nCompare: portdoc diff before.json after.json`);
+      return comparison.complete ? 0 : 2;
+    }
+    const reader = dependencies.readSnapshot ?? readSnapshot;
+    const [before, after] = await Promise.all([reader(options.before), reader(options.after)]);
+    const report = compareSnapshots(before, after);
+    stdout(options.json ? JSON.stringify(report, null, 2) : formatDiff(report, { language }));
+    return diffExitCode(report);
+  } catch (error) {
+    const reason = error.code === "EEXIST"
+      ? language === "zh-CN" ? "输出文件已存在；请选择新文件，快照不会覆盖已有文件。" : "Output already exists; choose a new file. Snapshots never overwrite files."
+      : error.message;
+    stderr(`${language === "zh-CN" ? "无法完成" : "Cannot complete"} ${options.command}: ${reason}`);
+    return 2;
+  }
 }
 
 function requireValue(argv, index, option) {

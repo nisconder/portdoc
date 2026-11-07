@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Add `snapshot [port] --out <new-file.json>` for inventory or single-port evidence, preserving the existing embedded report schemas and refusing overwrites.
+- Add offline `diff <before.json> <after.json>` with listener/project, container/Compose, reachability and exclusion-range changes.
+- Keep incomplete sources, missing identity metadata, probe failures and source-context changes explicit instead of treating missing evidence as removal or repair.
+- Provide bilingual help, snapshot/diff v1 JSON contracts, conservative exit codes, deterministic fixtures and a real Windows listener lifecycle validation script.
+
 ## 0.7.1
 
 - Bound collector timeout cleanup to an additional 250 ms, closing pipes and unreferencing process handles at the deadline.
