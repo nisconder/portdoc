@@ -6,6 +6,10 @@
 - Add offline `diff <before.json> <after.json>` with listener/project, container/Compose, reachability and exclusion-range changes.
 - Keep incomplete sources, missing identity metadata, probe failures and source-context changes explicit instead of treating missing evidence as removal or repair.
 - Provide bilingual help, snapshot/diff v1 JSON contracts, conservative exit codes, deterministic fixtures and a real Windows listener lifecycle validation script.
+- Redact complete quoted credentials before truncating long command lines, preventing partial secrets from appearing in reports.
+- Handle escaped quotes and unterminated credential values without exposing their trailing words.
+- Treat blank or control-only process command lines as missing metadata instead of throwing during identity collection.
+- Match credential names at complete name boundaries to avoid repeated scans of long dotted identifiers.
 
 ## 0.7.1
 

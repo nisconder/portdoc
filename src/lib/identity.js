@@ -1,23 +1,32 @@
 import path from "node:path";
 
-const SECRET_NAME = "(?:[\\w.-]*(?:password|passwd|pwd|token|secret|api[-_]?key|access[-_]?key|credential|authorization|cookie)[\\w.-]*)";
+// Keep the keyword check inside a lookahead so a missing separator does not
+// retry every keyword/name split in long identifiers containing repeated tokens.
+const SECRET_NAME = "(?=[\\w.-]*(?:password|passwd|pwd|token|secret|api[-_]?key|access[-_]?key|credential|authorization|cookie))[\\w.-]+";
+const QUOTED_VALUE = String.raw`(?:"(?:\\[\s\S]?|[^"\\])*(?:"|$)|'(?:\\[\s\S]?|[^'\\])*(?:'|$))`;
+const CONTROL_CHARACTERS = /[\u0000-\u001f\u007f-\u009f]/g;
 
 // Reports can be copied into public issues. Keep common credentials out of
 // both the human-readable command and the JSON evidence.
 export function redactCommandLine(value) {
   if (!value) return null;
-  return cleanIdentityText(value)
+  // Redact before limiting the display length: cutting a quoted credential
+  // first removes its closing quote and can expose the remaining words.
+  // Start secret names only at a complete name boundary. A word boundary
+  // retries within every dot/dash in long identifiers and causes quadratic work.
+  const redacted = String(value).replace(CONTROL_CHARACTERS, " ")
     .replace(/(https?:\/\/)[^\s/@]+:[^\s/@]+@/gi, "$1[REDACTED]@")
     .replace(/(\bAuthorization\s*:\s*)(?:Bearer|Basic)\s+[^\s"']+/gi, "$1[REDACTED]")
-    .replace(new RegExp(`((?:--?|\\b)${SECRET_NAME}\\s*(?:=|:)\\s*)(?:"[^"\\r\\n]*"|'[^'\\r\\n]*'|[^\\s;&]+)`, "gi"), "$1[REDACTED]")
-    .replace(new RegExp(`(--?${SECRET_NAME}\\s+)(?:"[^"\\r\\n]*"|'[^'\\r\\n]*'|[^\\s]+)`, "gi"), "$1[REDACTED]")
+    .replace(new RegExp(`(?<![\\w.-])((?:--?)?${SECRET_NAME}\\s*(?:=|:)\\s*)(?:${QUOTED_VALUE}|[^\\s;&]+)`, "gi"), "$1[REDACTED]")
+    .replace(new RegExp(`(?<![\\w.-])(--?${SECRET_NAME}\\s+)(?:${QUOTED_VALUE}|[^\\s]+)`, "gi"), "$1[REDACTED]")
     .replace(/(\b(?:Bearer|Basic)\s+)[A-Za-z0-9+/_.=-]{8,}/gi, "$1[REDACTED]")
     .replace(new RegExp(`([?&]${SECRET_NAME}=)[^&\\s"']+`, "gi"), "$1[REDACTED]");
+  return cleanIdentityText(redacted);
 }
 
 export function cleanIdentityText(value) {
   if (!value) return null;
-  return String(value).replace(/[\u0000-\u001f\u007f-\u009f]/g, " ").slice(0, 8192).trim() || null;
+  return String(value).replace(CONTROL_CHARACTERS, " ").slice(0, 8192).trim() || null;
 }
 
 export function inferProjectPath(commandLine, platform = "win32") {

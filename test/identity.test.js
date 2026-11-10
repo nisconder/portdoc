@@ -15,6 +15,60 @@ test("redacts credentials before command lines enter a report", () => {
   assert.match(safe, /\[REDACTED\]/);
 });
 
+test("treats blank or control-only command lines as missing identity", () => {
+  for (const command of [null, "", "   ", "\u0000\t\n\u001b\u007f\u009f"]) {
+    assert.equal(redactCommandLine(command), null);
+    assert.deepEqual(processIdentity(command, null), {
+      commandLine: null, cwd: null, projectPath: null, identitySource: null,
+    });
+  }
+});
+
+test("redacts complete quoted credentials before truncating long command lines", () => {
+  const secret = "sensitive words ".repeat(800);
+  for (const argument of [`--password="${secret}"`, `--token '${secret}'`, `API_KEY='${secret}'`]) {
+    const safe = redactCommandLine(`node app.js ${argument} --host`);
+    assert.doesNotMatch(safe, /sensitive|words/);
+    assert.match(safe, /\[REDACTED\]/);
+    assert.match(safe, /--host$/);
+  }
+  assert.equal(redactCommandLine(`node ${"x".repeat(9000)}`).length, 8192);
+});
+
+test("redacts credentials containing escaped quotes or missing closing quotes", () => {
+  for (const argument of [
+    String.raw`--token="fake\" PRIVATE_TAIL"`,
+    String.raw`--password 'fake\' PRIVATE_TAIL'`,
+    'API_KEY="fake PRIVATE_TAIL',
+    '--secret "fake PRIVATE_TAIL\\',
+  ]) {
+    const safe = redactCommandLine(`node app.js ${argument}`);
+    assert.doesNotMatch(safe, /fake|PRIVATE_TAIL/);
+    assert.match(safe, /\[REDACTED\]$/);
+  }
+  assert.equal(redactCommandLine(String.raw`node app.js --token="fake\" PRIVATE_TAIL" --host`), "node app.js --token=[REDACTED] --host");
+});
+
+test("normalizes control separators before redacting command-line credentials", () => {
+  for (const separator of ["\u0000", "\u001b", "\u0085"]) {
+    assert.equal(redactCommandLine(`node app.js --token${separator}PRIVATE_VALUE`), "node app.js --token [REDACTED]");
+  }
+});
+
+test("handles long dotted identifiers while retaining credential name boundaries", () => {
+  const identifier = "x.".repeat(32768);
+  assert.equal(redactCommandLine(identifier), identifier.slice(0, 8192));
+  for (const name of ["token.", "token-"]) {
+    const repeated = name.repeat(10923);
+    assert.equal(redactCommandLine(repeated), repeated.slice(0, 8192));
+  }
+  assert.equal(redactCommandLine(`--token="${identifier} PRIVATE_TAIL" --host`), "--token=[REDACTED] --host");
+  assert.equal(redactCommandLine('node app.js --client.secret "PRIVATE_VALUE" npm_config_token=PRIVATE_VALUE auth.token:PRIVATE_VALUE'),
+    "node app.js --client.secret [REDACTED] npm_config_token=[REDACTED] auth.token:[REDACTED]");
+  assert.equal(redactCommandLine('node app.js --ordinary --token PRIVATE_VALUE WRAPPER="API_KEY=PRIVATE_VALUE"'),
+    "node app.js --ordinary --token [REDACTED] WRAPPER=\"API_KEY=[REDACTED]");
+});
+
 test("identifies Windows project paths without inventing a working directory", () => {
   const identity = processIdentity('"C:\\Program Files\\nodejs\\node.exe" "D:\\work\\hello world\\node_modules\\vite\\bin\\vite.js" --host', null);
   assert.equal(identity.projectPath, "D:\\work\\hello world");
