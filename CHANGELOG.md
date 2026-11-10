@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.0
 
 - Add `snapshot [port] --out <new-file.json>` for inventory or single-port evidence, preserving the existing embedded report schemas and refusing overwrites.
 - Add offline `diff <before.json> <after.json>` with listener/project, container/Compose, reachability and exclusion-range changes.

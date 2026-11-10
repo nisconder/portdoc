@@ -40,8 +40,8 @@ logic; real Windows/WSL/Docker diagnosis still needs environment-specific valida
 The release workflow is manually dispatched against an existing version tag;
 its default uploads only an Actions artifact. Setting `upload` to true also
 attaches assets to an existing GitHub Release, with write permission confined
-to that upload job. For example, create tag `v0.7.1` and its GitHub Release,
-then dispatch `release-exe.yml` with `tag=v0.7.1` and `upload=true`.
+to that upload job. For example, create tag `v0.8.0` and its GitHub Release,
+then dispatch `release-exe.yml` with `tag=v0.8.0` and `upload=true`.
 The workflow verifies package/CLI versions and source commit before uploading.
 npm publishing remains a separate maintainer action.
 
