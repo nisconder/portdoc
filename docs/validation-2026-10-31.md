@@ -19,16 +19,18 @@ node scripts/validate-live.mjs --out .build/validation-new --entry .build/verifi
 | 案例 | 独立结果与工具报告 | 结论及边界 |
 | --- | --- | --- |
 | IPv4 临时监听 | Windows IPv4 socket 成功，Get-NetTCPConnection 与工具给出相同监听 PID/地址；localhost 实际首选 `::1`，独立及工具 IPv6 均为 `EACCES` | IPv4 可达、归属吻合；IPv6 是环境受限的未知，不能当作连接被拒绝。工具保留 `reachable: null` 和 `PARTIAL_PROBES` |
-| Ubuntu WSL 临时监听 | `ss`、`/proc` 和工具给出同一 Python PID；WSL 内 IPv4 连接成功，Windows IPv4 也成功；工具观察到 Windows `wslrelay` | 真实正常转发对照吻合，没有把 relay 与 WSL 服务误报为独立冲突；Windows 不可达变体未复现，Windows IPv6 仍受限 |
+| Ubuntu WSL 临时监听 | `ss`、`/proc` 和工具给出同一 Python PID；WSL 内独立连接及工具 IPv4 探测均成功；Windows 独立连接及工具 IPv4 探测均为 `ECONNREFUSED`，工具的 Windows 监听列表为空 | 已覆盖 WSL 有监听但 Windows IPv4 不可达的变体；工具给出 `UNKNOWN`、`WSL_NOT_REACHABLE_FROM_WINDOWS` 及退出码 2；Windows IPv6 仍为 `EACCES`，不能据此确定转发或防火墙根因 |
 | 监听已关闭且 Docker CLI 指定为不存在路径 | Get-NetTCPConnection 无监听，独立 IPv4 为 ECONNREFUSED；Test-Path=false，实际 spawn=ENOENT；工具 Docker 来源为 unavailable | 工具给出 `UNKNOWN`、低置信度及退出码 2，未把不完整证据报为 FREE；不是 Docker Engine 正常时的映射验证 |
 
 对应的未经改写工具报告：[IPv4](evidence/2026-10-31/npm-local/ipv4-cli.report.json)、[WSL](evidence/2026-10-31/npm-local/wsl-cli.report.json)、[缺失 Docker](evidence/2026-10-31/npm-local/missing-docker-cli.report.json)。独立 socket/DNS 结果：[Windows 监听](evidence/2026-10-31/npm-local/ipv4.independent-endpoints.json)、[WSL 服务的 Windows 访问](evidence/2026-10-31/npm-local/wsl-windows.independent-endpoints.json)。WSL 的 [ss](evidence/2026-10-31/npm-local/wsl-independent-ss.stdout.txt)、[独立连接](evidence/2026-10-31/npm-local/wsl-independent-python-connect.stdout.txt)、[清理确认](evidence/2026-10-31/npm-local/wsl-cleanup-owned-pid.stdout.txt)另存为原始输出。
+
+原始 manifest 中，WSL 案例的 `windowsUnreachableVariant.covered` 为 `true`；该 IPv4 可达性差异已经观察到。Windows IPv6 探测受 `EACCES` 限制，因此该案例整体仍为 `environment-limited`，整次验证仍为 `incomplete`。
 
 ## 测试及未覆盖项
 
 [本机完整测试原始输出](evidence/2026-10-31/npm-local/tests-windows.txt)：120 项，119 通过，1 项 POSIX 进程组专项在 Windows 跳过。网络测试先以独立原生 socket 确认环境，受限时严格核对错误，不再因生产探测自己返回 EACCES 就跳过。命令超时测试将调度检查与真实进程集成分开，保存构造进程 PID，并为忙碌 runner 的 Node 启动留出余量。
 
-本次未证明：Windows IPv6 正常可用时的拒绝/成功行为；Windows 无法访问 WSL 的变体；真实 Docker 发布重叠；已有 Windows 排除端口的完整案例；其他发行版、WSL 网络模式、权限和系统组合。不能据此宣称所有环境均正确。
+本次未证明：Windows IPv6 正常可用时的拒绝/成功行为；WSL 正常转发时 Windows relay 与 WSL 服务的归属判定；真实 Docker 发布重叠；已有 Windows 排除端口的完整案例；其他发行版、WSL 网络模式、权限和系统组合。不能据此宣称所有环境均正确。
 
 ## GitHub 分发产物核验
 
