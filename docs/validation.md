@@ -1,6 +1,6 @@
 # 真实诊断案例与复现记录
 
-这份清单用于建立可复现证据，不是已经通过的兼容性声明。[2026-10-31 实测记录](validation-2026-10-31.md)保存了 Windows IPv4、Ubuntu WSL 正常转发及缺失 Docker CLI 的实际观察；IPv6 策略限制和未覆盖的变体单列说明。下面五类场景是完整验证清单，不能把单机部分覆盖等同于全部通过。单元测试、故障注入、`portdoc demo` 和真实机器报告应分别记录。当前 JSON 契约为 [report.schema.json](../schema/report.schema.json)，`schemaVersion` 为 3。
+这份清单用于建立可复现证据，不是已经通过的兼容性声明。[2026-10-31 实测记录](validation-2026-10-31.md)保存了 Windows IPv4 监听、Ubuntu WSL 有监听但 Windows IPv4 不可达，以及缺失 Docker CLI 的实际观察；IPv6 策略限制和未覆盖的变体单列说明。下面五类场景是完整验证清单，不能把单机部分覆盖等同于全部通过。单元测试、故障注入、`portdoc demo` 和真实机器报告应分别记录。当前 JSON 契约为 [report.schema.json](../schema/report.schema.json)，`schemaVersion` 为 3。
 
 从仓库运行真实验证脚本（会启动指定 WSL 发行版，不启动 Docker 或修改网络配置）：
 
